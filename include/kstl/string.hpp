@@ -19,8 +19,13 @@ namespace kstd {
         void reserve(size_t bytes) noexcept;
         void shrink_to_fit() noexcept;
     public:
-        char* data() noexcept;
-        const char* c_string() noexcept;
+        char* data() const noexcept;
+        const char* c_str() const noexcept;
+    public:
+        string& operator=(const char*);
+        string& operator=(const string &s);
+        string& operator+=(const char*);
+        string& operator+=(const string &s);
     public:
         string();
         string(const char *data);

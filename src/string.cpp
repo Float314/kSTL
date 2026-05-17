@@ -11,10 +11,11 @@ namespace kstd {
     }
 
     string::string(const char *data) {
-        this->_capacity = strlen(data);
-        this->_size = this->_capacity;
+        this->_size = strlen(data);
+        this->_capacity = this->_size + 1;
         this->_data = new char[this->_capacity];
         strncpy(this->_data, data, this->_capacity);
+        this->_data[this->_capacity - 1] = '\0';
     }
 
     size_t string::size() const noexcept {
@@ -26,15 +27,26 @@ namespace kstd {
     }
 
     void string::append(char c) noexcept {
-        if (this->_size + 1 > this->_capacity) {
+        if (this->_data == nullptr) {
+            this->_capacity = 2;
+            this->_size = 1;
+            this->_data = new char[2];
+            this->_data[0] = c;
+            this->_data[1] = '\0';
+            return;
+        }
+
+        if (this->_size + 2 > this->_capacity) {
+            size_t old_capacity = this->_capacity;
             this->_capacity *= 2;
             char *new_data = new char[this->_capacity];
-            kstd::memcpy(new_data, this->_data, this->_capacity);
-            delete this->_data;
+            kstd::memcpy(new_data, this->_data, old_capacity);
+            delete[] this->_data;
             this->_data = new_data;
         }
 
         this->_data[this->_size++] = c;
+        this->_data[this->_size] = '\0';
     }
 
     void string::append(char *str) noexcept {
@@ -56,40 +68,78 @@ namespace kstd {
             return;
         }
 
+        size_t old_capacity = this->_capacity;
         this->_capacity = bytes;
         char *new_data = new char[this->_capacity];
-        kstd::memcpy(new_data, this->_data, this->_capacity);
-        delete this->_data;
+        kstd::memcpy(new_data, this->_data, old_capacity);
+        delete[] this->_data;
         this->_data = new_data;
     }
 
     void string::shrink_to_fit() noexcept {
         if (this->_capacity > this->_size) {
-            this->_capacity = this->_size;
+            this->_capacity = this->_size + 1;
             char *new_data = new char[this->_capacity];
             kstd::memcpy(new_data, this->_data, this->_capacity);
-            delete this->_data;
+            delete[] this->_data;
             this->_data = new_data;
         }
     }
 
-    char* string::data() noexcept {
+    char* string::data() const noexcept {
         if (this->_capacity == 0) {
             return &null_terminator;
         }
         return this->_data;
     }
 
-    const char* string::c_string() noexcept {
+    const char* string::c_str() const noexcept {
         if (this->_capacity == 0) {
             return "";
         }
         return this->_data;
-    } 
+    }
+
+    string& string::operator=(const char* s) {
+        if (this->_data != nullptr) {
+            delete[] this->_data;
+        }
+
+        this->_size = strlen(s);
+        this->_capacity = this->_size + 1;
+        this->_data = new char[this->_capacity];
+        strncpy(this->_data, s, this->_capacity - 1);
+        this->_data[this->_capacity - 1] = '\0';
+        return *this;
+    }
+
+    string& string::operator=(const string &s) {
+        if (this == &s) return *this;
+
+        if (this->_data != nullptr) {
+            delete[] this->_data;
+        }
+
+        this->_size = s._size;
+        this->_capacity = s._capacity;
+        this->_data = new char[this->_capacity];
+        kstd::memcpy(this->_data, s._data, s._capacity);
+        return *this;
+    }
+
+    string& string::operator+=(const char* s) {
+        this->append(s);
+        return *this;
+    }
+
+    string& string::operator+=(const string &s) {
+        this->append(s);
+        return *this;
+    }
 
     string::~string() {
         if (this->_data != nullptr) {
-            delete this->_data;
+            delete[] this->_data;
         }
     }
 
