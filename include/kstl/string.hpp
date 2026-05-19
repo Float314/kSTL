@@ -14,6 +14,7 @@ namespace kstd {
     public:
         size_t size() const noexcept;
         size_t capacity() const noexcept;
+        bool has_value() const noexcept; // by Float314
     public:
         void append(char c) noexcept;
         void append(char *str) noexcept;

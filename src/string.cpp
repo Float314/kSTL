@@ -113,6 +113,14 @@ namespace kstd {
         return this->_data;
     }
 
+    /// @brief Returns true if the string has a non-empty value, false otherwise. (Added by Float314)
+    bool string::has_value() const noexcept {
+        if (this->_data == nullptr || this->_size == 0) {
+            return false;
+        }
+        return true;
+    }
+
     const char* string::c_str() const noexcept {
         if (this->_capacity == 0) {
             return "";
