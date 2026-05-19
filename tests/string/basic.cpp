@@ -12,6 +12,7 @@ int main() {
         kstl::test::log("Operator", std::format("s += {}", "\", world!\""));
         s += ", world!";
         kstl::test::log("var(s)", s.data());
+        kstl::test::log("Is empty? {}", s.is_empty() ? "Yes" : "No"); // by float314: Test is_empty()
     }
     kstl::test::end();
 }
