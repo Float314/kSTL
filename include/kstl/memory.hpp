@@ -105,4 +105,89 @@ namespace kstd {
         new (ptr) T(kstd::forward<Args>(args)...);
         return unique_ptr<T>(ptr);
     }
+
+    // TODO: Implement shared_ptr
+
+//     template<typename T, typename Deleter = default_delete<T>>
+//     class shared_ptr {
+//         static_assert(!kstd::is_array_v<T>, "shared_ptr<T[]> is not supported");
+//     private:
+//         struct control_block {
+//
+//         };
+//
+//         T *ptr = nullptr;
+// #ifdef KSTL_SHARED_PTR_ATOMIC_REFCOUNT
+//         static_assert(false, "shared_ptr with atomic reference count is not supported in an embedded environment");
+// #else
+//
+// #endif
+//         [[no_unique_address]] Deleter deleter;
+//     public:
+//         T* get() const noexcept {
+//             return this->ptr;
+//         }
+//
+//         Deleter get_deleter() const noexcept {
+//             return this->deleter;
+//         }
+//     public:
+//         T* release() noexcept {
+//             T* ret_ptr = this->ptr;
+//             this->ptr = nullptr;
+//             return ret_ptr;
+//         }
+//
+//         void reset(T *ptr = nullptr) noexcept {
+//             if (this->ptr != nullptr) {
+//                 deleter(this->ptr);
+//             }
+//
+//             this->ptr = ptr;
+//         }
+//     public:
+//         void swap(shared_ptr<T> &other) noexcept {
+//             kstd::swap(this->ptr, other.ptr);
+//         }
+//     public:
+//         explicit operator bool() const noexcept {
+//             return this->ptr != nullptr;
+//         }
+//
+//         T* operator->() const noexcept {
+//             return this->ptr;
+//         }
+//
+//         T& operator*() const noexcept {
+//             return *this->ptr;
+//         }
+//
+//         shared_ptr& operator=(const shared_ptr &) noexcept = delete;
+//
+//         shared_ptr& operator=(shared_ptr &&other) noexcept {
+//             this->ptr = other.ptr;
+//             this->deleter = other.deleter;
+//
+//             other.ptr = nullptr;
+//
+//             return *this;
+//         }
+//     public:
+//         shared_ptr(T *ptr) : ptr(ptr) {}
+//         shared_ptr() : ptr(nullptr) {}
+//
+//         shared_ptr(const shared_ptr &other) = delete;
+//         shared_ptr(shared_ptr &&other) {
+//             this->ptr = other.ptr;
+//             this->deleter = other.deleter;
+//
+//             other.ptr = nullptr;
+//         }
+//     public:
+//         ~shared_ptr() {
+//             if (ptr != nullptr) {
+//                 deleter(ptr);
+//             }
+//         }
+//     };
 }

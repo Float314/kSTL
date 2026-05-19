@@ -32,6 +32,7 @@ set(TEST_NAMES
     string/basic
     vector/basic
     unique_ptr/basic
+    optional/basic
 )
 
 foreach(test_name IN LISTS TEST_NAMES)
