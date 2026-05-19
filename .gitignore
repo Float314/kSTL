@@ -22,5 +22,8 @@ CMakeSettings.json
 perf.*
 windeps/
 
+# VScode
+.vscode/
+
 # Junk stuff
 ignore_dir/*
