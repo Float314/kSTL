@@ -134,7 +134,7 @@ namespace kstd {
 
     /// @brief Returns true if the string has a non-empty value, false otherwise. (Added by Float314)
     bool string::has_value() const noexcept {
-        if (this->_data == nullptr || this->_size == 0) {
+        if (this->_data == nullptr || this->_size == 0) { /* Niche lol */
             return false;
         }
         return true;
