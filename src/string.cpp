@@ -13,8 +13,6 @@ namespace kstd {
     char null_terminator = '\0';
 
     string::string() {
-        this->_capacity = 0;
-        this->_size = 0;
     }
 
     string::string(const char *data) {
@@ -59,7 +57,27 @@ namespace kstd {
     void string::append(char *str) noexcept {
         size_t len = strlen(str);
         for (size_t i = 0; i < len; ++i) {
-            this->append(str[i]);
+            char c = str[i];
+            if (this->_data == nullptr) {
+                this->_capacity = 2;
+                this->_size = 1;
+                this->_data = (char*) kstl_globals::malloc(2);
+                this->_data[0] = c;
+                this->_data[1] = '\0';
+                return;
+            }
+
+            if (this->_size + 2 > this->_capacity) {
+                size_t old_capacity = this->_capacity;
+                this->_capacity *= 2;
+                char *new_data = (char*) kstl_globals::malloc(this->_capacity);
+                kstd::memcpy(new_data, this->_data, old_capacity);
+                kstl_globals::free(this->_data);
+                this->_data = new_data;
+            }
+
+            this->_data[this->_size++] = c;
+            this->_data[this->_size] = '\0';
         }
     }
 
@@ -84,7 +102,7 @@ namespace kstd {
     }
 
     void string::reserve(size_t bytes) noexcept {
-        if (bytes < this->_capacity) {
+        if (bytes <= this->_capacity) {
             return;
         }
 
@@ -97,7 +115,7 @@ namespace kstd {
     }
 
     void string::shrink_to_fit() noexcept {
-        if (this->_capacity > this->_size) {
+        if (this->_capacity > this->_size + 1) {
             this->_capacity = this->_size + 1;
             char *new_data = (char*) kstl_globals::malloc(this->_capacity);
             kstd::memcpy(new_data, this->_data, this->_capacity);
@@ -108,6 +126,7 @@ namespace kstd {
 
     char* string::data() const noexcept {
         if (this->_capacity == 0) {
+            // pwease don't modify it :3
             return &null_terminator;
         }
         return this->_data;
