@@ -1,0 +1,55 @@
+#include "common.hpp"
+#include "kstl/runtime.hpp"
+#include <cstdlib>
+#include <cstdio>
+#include <iostream>
+
+namespace std {
+    void terminate(void) noexcept;
+}
+
+size_t g_memory_allocated = 0;
+size_t g_memory_allocations = 0;
+
+namespace kstl::test {
+    void init() {
+        struct header {
+            size_t sz;
+        };
+        kstd::rt_init init_data = {
+            .allocator_info = {
+                .alloc = [](size_t size) -> void* {
+                    void *mem = malloc(size + sizeof(header));
+                    printf("[A]: %zu bytes -> %p\n", size, reinterpret_cast<void*>((char*) mem + sizeof(header)));
+                    g_memory_allocated += size;
+                    g_memory_allocations += 1;
+                    ((header*) mem)->sz = size;
+                    return reinterpret_cast<void*>((char*) mem + sizeof(header));
+                },
+                .free = [](void *mem) -> void {
+                    header *h = (header*) ((char*) mem - sizeof(header));
+                    g_memory_allocated -= h->sz;
+                    g_memory_allocations -= 1;
+                    printf("[F]: %zu bytes -> %p\n", h->sz, mem);
+
+                    free(h);
+                }
+            },
+            .panic = std::terminate
+        };
+
+        auto ec = kstd::init(init_data);
+        if (!ec) init_data.panic();
+    }
+
+    void log(std::string prefix, std::string data) {
+        printf("%s: %s\n", prefix.c_str(), data.c_str());
+    }
+
+    void end() {
+        printf("--- Memory Status ---\n");
+        printf("Unfreed Memory: %zu bytes\n", g_memory_allocated);
+        printf("Unfreed Allocations: %zu\n", g_memory_allocations);
+        printf("--- ------------- ---\n");
+    }
+}

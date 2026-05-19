@@ -4,6 +4,9 @@
 
 namespace kstd {
     class string {
+    public:
+        using iterator = char *;
+        using const_iterator = const char *;
     private:
         char *_data = nullptr;
         size_t _size = 0;
@@ -16,19 +19,35 @@ namespace kstd {
         void append(char *str) noexcept;
         void append(const string &str) noexcept;
 
+        void push_back(char c) noexcept;
+        void pop_back() noexcept;
+
         void reserve(size_t bytes) noexcept;
         void shrink_to_fit() noexcept;
     public:
         char* data() const noexcept;
         const char* c_str() const noexcept;
     public:
-        string& operator=(const char*);
-        string& operator=(const string &s);
-        string& operator+=(const char*);
-        string& operator+=(const string &s);
+        iterator begin() noexcept;
+        iterator end() noexcept;
+
+        const_iterator begin() const noexcept;
+        const_iterator end() const noexcept;
+    public:
+        string& operator=(const char*) noexcept;
+        string& operator=(const string &s) noexcept;
+        string& operator+=(const char*) noexcept;
+        string& operator+=(const string &s) noexcept;
+
+        string& operator=(string &&other) noexcept;
+
+        string operator+(const string &s) const noexcept;
     public:
         string();
         string(const char *data);
+
+        string(const string &s);
+        string(string &&other);
     public:
         ~string();
     };

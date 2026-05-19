@@ -27,3 +27,24 @@ target_link_libraries(${PROJECT_NAME} PRIVATE)
 
 target_include_directories(${PROJECT_NAME}_exec PRIVATE include)
 target_link_libraries(${PROJECT_NAME}_exec PRIVATE kstl)
+
+set(TEST_NAMES
+    string/basic
+    vector/basic
+)
+
+foreach(test_name IN LISTS TEST_NAMES)
+    string(REPLACE "/" "_" test_target "${test_name}")
+    add_executable(${test_target}
+        tests/common.cpp
+        tests/${test_name}.cpp
+    )
+    target_include_directories(${test_target} PRIVATE
+        include
+        src/include
+        tests
+    )
+    target_link_libraries(${test_target} PRIVATE
+        kstl
+    )
+endforeach()
