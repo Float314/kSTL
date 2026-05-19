@@ -31,6 +31,7 @@ target_link_libraries(${PROJECT_NAME}_exec PRIVATE kstl)
 set(TEST_NAMES
     string/basic
     vector/basic
+    unique_ptr/basic
 )
 
 foreach(test_name IN LISTS TEST_NAMES)
