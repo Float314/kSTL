@@ -131,6 +131,14 @@ namespace kstd {
         }
         return this->_data;
     }
+    
+    bool string::has_value() const noexcept {
+        return this->_data != nullptr && this->_size > 0;
+    }
+
+    bool string::is_empty() const noexcept {
+        return this->_size == 0;
+    }
 
     const char* string::c_str() const noexcept {
         if (this->_capacity == 0) {
