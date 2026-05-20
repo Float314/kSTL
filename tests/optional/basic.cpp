@@ -18,11 +18,16 @@ int main() {
         auto o1 = divide(4, 0);
         auto o2 = divide(4, 2);
 
-        kstl::test::log("var(o1)", std::format("{}", o1.value_or(0)));
+        float o1_v = o1.value_or(0);
+        k_expect(o1_v == 0);
+        kstl::test::log("var(o1.value_or(0))", std::format("{}", o1_v));
         if (o1) {
+            k_expect(o1.has_value());
             kstl::test::log("operator*(o1)", std::format("{}", *o1));
         }
-        kstl::test::log("var(o2)", std::format("{}", o2.value_or(0)));
+        float o2_v = o2.value_or(0);
+        k_expect(o2_v != 0);
+        kstl::test::log("var(o2)", std::format("{}", o2_v));
     }
     kstl::test::end();
 }

@@ -16,7 +16,7 @@ namespace kstd {
     }
 
     string::string(const char *data) {
-        this->_size = strlen(data);
+this->_size = strlen(data);
         this->_capacity = this->_size + 1;
         this->_data = (char*) kstl_globals::malloc(this->_capacity);
         strncpy(this->_data, data, this->_capacity);
@@ -390,5 +390,23 @@ namespace kstd {
         *dst = '\0';
 
         return original_dst;
+    }
+
+    bool streq(const char *s1, const char *s2) {
+        size_t s1_len = strlen(s1);
+        size_t s2_len = strlen(s2);
+
+        if (s1_len != s2_len) {
+            return false;
+        }
+
+        // s1 && s2 are same length
+        for (size_t i = 0; i < s1_len; ++i) {
+            if (s1[i] != s2[i]) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

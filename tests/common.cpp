@@ -11,8 +11,12 @@ namespace std {
 size_t g_memory_allocated = 0;
 size_t g_memory_allocations = 0;
 
+namespace kstl_globals {
+    extern kstd::rt_init g_init_data;
+}
+
 namespace kstl::test {
-    void init() {
+    void init(void (*panic_handler)(void)) {
         struct header {
             size_t sz;
         };
@@ -35,7 +39,7 @@ namespace kstl::test {
                     free(h);
                 }
             },
-            .panic = std::terminate
+            .panic = panic_handler
         };
 
         auto ec = kstd::init(init_data);
@@ -51,5 +55,15 @@ namespace kstl::test {
         printf("Unfreed Memory: %zu bytes\n", g_memory_allocated);
         printf("Unfreed Allocations: %zu\n", g_memory_allocations);
         printf("--- ------------- ---\n");
+    }
+
+    void expect(bool expectation, const char *condition) {
+        if (!expectation) {
+            log("EXPECTATION FAILURE", std::format("{}", condition));
+            end();
+            fflush(stdout);
+            fflush(stderr);
+            kstl_globals::g_init_data.panic();
+        }
     }
 }

@@ -18,21 +18,22 @@ add_library(${PROJECT_NAME}
     src/string.cpp
     src/stdlib.cpp
 )
-add_executable(${PROJECT_NAME}_exec
-    kstl_exec.cpp
+add_executable(tester
+    tests/tester.cpp
 )
 target_include_directories(${PROJECT_NAME} PRIVATE src/include)
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 target_link_libraries(${PROJECT_NAME} PRIVATE)
 
-target_include_directories(${PROJECT_NAME}_exec PRIVATE include)
-target_link_libraries(${PROJECT_NAME}_exec PRIVATE kstl)
+target_include_directories(tester PRIVATE include)
+target_link_libraries(tester PRIVATE kstl)
 
 set(TEST_NAMES
     string/basic
 
     vector/basic
     vector/iterators
+    vector/edge_case_indexing
 
     unique_ptr/basic
 
@@ -54,17 +55,31 @@ target_link_libraries(log_vector PRIVATE
 
 foreach(test_name IN LISTS TEST_NAMES)
     string(REPLACE "/" "_" test_target "${test_name}")
+
+    get_filename_component(test_category "${test_name}" DIRECTORY)
+    get_filename_component(test_binary "${test_name}" NAME)
+
     add_executable(${test_target}
         tests/common.cpp
         tests/${test_name}.cpp
     )
+
     target_include_directories(${test_target} PRIVATE
         include
         src/include
         tests
     )
+
     target_link_libraries(${test_target} PRIVATE
         kstl
         log_vector
+    )
+
+    set_target_properties(${test_target} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY
+        "${CMAKE_SOURCE_DIR}/bin/tests/${test_category}"
+
+        OUTPUT_NAME
+        "${test_binary}"
     )
 endforeach()

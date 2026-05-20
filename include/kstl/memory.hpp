@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <kstl/runtime.hpp>
 #include <kstl/stdlib.hpp>
 #include <kstl/utility.hpp>
@@ -76,6 +77,18 @@ namespace kstd {
             other.ptr = nullptr;
             
             return *this;
+        }
+
+        bool operator==(const unique_ptr &other) const noexcept {
+            return other.ptr == this->ptr;
+        }
+
+        bool operator==(std::nullptr_t) const noexcept {
+            return this->ptr == nullptr;
+        }
+
+        bool operator!=(std::nullptr_t) const noexcept {
+            return this->ptr != nullptr;
         }
     public:
         unique_ptr(T *ptr) : ptr(ptr) {}
