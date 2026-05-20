@@ -1,2 +1,4 @@
 # kSTL
-A freestanding and minimal implementation of the C++ STL
+A freestanding and minimal implementation of the C++ Standard Template Library (STL)
+
+
