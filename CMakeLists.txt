@@ -30,9 +30,26 @@ target_link_libraries(${PROJECT_NAME}_exec PRIVATE kstl)
 
 set(TEST_NAMES
     string/basic
+
     vector/basic
+    vector/iterators
+
     unique_ptr/basic
+
     optional/basic
+)
+
+add_library(log_vector STATIC
+    tests/vector/log_vector.cpp
+)
+
+target_include_directories(log_vector PRIVATE
+    include
+    src/include
+    tests
+)
+target_link_libraries(log_vector PRIVATE
+    kstl
 )
 
 foreach(test_name IN LISTS TEST_NAMES)
@@ -48,5 +65,6 @@ foreach(test_name IN LISTS TEST_NAMES)
     )
     target_link_libraries(${test_target} PRIVATE
         kstl
+        log_vector
     )
 endforeach()

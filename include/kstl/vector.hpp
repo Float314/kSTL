@@ -125,12 +125,21 @@ namespace kstd {
     public:
         vector() = default;
 
-        vector(const vector& v) {
+        vector(const vector &v) {
             this->_size = v._size;
             this->_capacity = v._capacity;
             this->_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
             for (size_t i = 0; i < this->_size; i++) {
                 new (this->_data + i) T(v._data[i]);
+            }
+        }
+
+        vector(size_t sz) {
+            this->_size = sz;
+            this->_capacity = sz;
+            this->_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
+            for (size_t i = 0; i < this->_size; ++i) {
+                new (this->_data + i) T();
             }
         }
 

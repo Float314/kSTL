@@ -23,6 +23,7 @@ void fn_cref(const kstd::unique_ptr<some_struct_t> &ptr) {
 int main() {
     kstl::test::init();
     {
+        kstl::test::log("construct", "kstd::unique_ptr<some_struct_t> ptr = kstd::make_unique<some_struct_t>()");
         kstd::unique_ptr<some_struct_t> ptr = kstd::make_unique<some_struct_t>();
         fn_ref(ptr);
         fn_cref(ptr);
