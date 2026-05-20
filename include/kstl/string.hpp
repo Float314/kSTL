@@ -16,6 +16,7 @@ namespace kstd {
         size_t capacity() const noexcept;
 
         // By float314: Req.d functions --------------------------
+        
         bool has_value() const noexcept; 
         bool is_empty() const noexcept; 
         // ------------------------------------------------------
