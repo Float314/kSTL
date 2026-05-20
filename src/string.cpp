@@ -136,8 +136,104 @@ namespace kstd {
         return this->_data != nullptr && this->_size > 0;
     }
 
-    bool string::is_empty() const noexcept {
+    bool string::empty() const noexcept {
         return this->_size == 0;
+    }
+
+    char& string::at(size_t index) noexcept {
+        if (index >= this->_size) {
+            kstl_globals::g_init_data.panic();
+        }
+
+        return this->_data[index];
+    }
+
+    const char& string::at(size_t index) const noexcept {
+        if (index >= this->_size) {
+            kstl_globals::g_init_data.panic();
+        }
+
+        return this->_data[index];
+    }
+
+    bool string::starts_with(char prefix) const noexcept {
+        if (this->_data == nullptr || this->_size == 0) {
+            return false;
+        }
+
+        return this->_data[0] == prefix;
+    }
+    
+    bool string::starts_with(const char *prefix) const noexcept {
+        size_t len = strlen(prefix);
+        if (this->_data == nullptr || this->_size < len) {
+            return false;
+        }
+
+        for (size_t i = 0; i < len; ++i) {
+            if (prefix[i] != this->_data[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool string::starts_with(const string &prefix) const noexcept {
+        size_t len = prefix._size;
+        if (this->_data == nullptr || this->_size < len) {
+            return false;
+        }
+
+        for (size_t i = 0; i < len; ++i) {
+            if (prefix[i] != this->_data[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool string::ends_with(char suffix) const noexcept {
+        if (this->_data == nullptr || this->_size == 0) {
+            return false;
+        }
+
+        return this->_data[this->_size - 1] == suffix;
+    }
+
+    bool string::ends_with(const char *suffix) const noexcept {
+        size_t len = strlen(suffix);
+        if (this->_data == nullptr || this->_size < len) {
+            return false;
+        }
+
+        for (size_t _i = len; _i != 0; --_i) {
+            size_t i = _i - 1;
+
+            if (suffix[i] != this->_data[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool string::ends_with(const string &suffix) const noexcept {
+        size_t len = suffix._size;
+        if (this->_data == nullptr || this->_size < len) {
+            return false;
+        }
+
+        for (size_t _i = len; _i != 0; --_i) {
+            size_t i = _i - 1;
+
+            if (suffix[i] != this->_data[i]) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     const char* string::c_str() const noexcept {
@@ -224,6 +320,14 @@ namespace kstd {
         res.append(this->_data);
         res.append(s._data);
         return res;
+    }
+
+    char& string::operator[](size_t index) noexcept {
+        return this->_data[index];
+    }
+
+    const char& string::operator[](size_t index) const noexcept {
+        return this->_data[index];
     }
 
     string::string(const string &s) {

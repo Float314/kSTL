@@ -7,6 +7,8 @@ namespace kstd {
     public:
         using iterator = char *;
         using const_iterator = const char *;
+
+        static constexpr size_t npos = size_t(-1);
     private:
         char *_data = nullptr;
         size_t _size = 0;
@@ -16,7 +18,10 @@ namespace kstd {
         size_t capacity() const noexcept;
       
         bool has_value() const noexcept; 
-        bool is_empty() const noexcept;
+        bool empty() const noexcept;
+
+        char& at(size_t index) noexcept;
+        const char& at(size_t index) const noexcept;
     public:
         void append(char c) noexcept;
         void append(char *str) noexcept;
@@ -30,6 +35,16 @@ namespace kstd {
     public:
         char* data() const noexcept;
         const char* c_str() const noexcept;
+    public:
+        string substr(size_t pos, size_t count = npos) const noexcept;
+
+        bool starts_with(char prefix) const noexcept;
+        bool starts_with(const char *prefix) const noexcept;
+        bool starts_with(const string &prefix) const noexcept;
+
+        bool ends_with(char suffix) const noexcept;
+        bool ends_with(const char *suffix) const noexcept;
+        bool ends_with(const string &suffix) const noexcept;
     public:
         iterator begin() noexcept;
         iterator end() noexcept;
@@ -45,6 +60,9 @@ namespace kstd {
         string& operator=(string &&other) noexcept;
 
         string operator+(const string &s) const noexcept;
+
+        char& operator[](size_t index) noexcept;
+        const char& operator[](size_t index) const noexcept;
     public:
         string();
         string(const char *data);

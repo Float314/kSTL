@@ -32,6 +32,22 @@ namespace kstd {
         size_t capacity() const noexcept {
             return this->_capacity;
         }
+
+        T& at(size_t index) noexcept {
+            if (index >= this->_size) {
+                kstl_globals::g_init_data.panic();
+            }
+
+            return this->_data[index];
+        }
+
+        const T& at(size_t index) const noexcept {
+            if (index >= this->_size) {
+                kstl_globals::g_init_data.panic();
+            }
+
+            return this->_data[index];
+        }
     public:
         void push_back(const T &elm) noexcept {
             if (this->_data == nullptr) {
@@ -103,8 +119,77 @@ namespace kstd {
             }
         }
     public:
+        T& operator[](size_t index) noexcept {
+            return this->_data[index];
+        }
+
+        const T& operator[](size_t index) const noexcept {
+            return this->_data[index];
+        }
+
+        vector& operator=(const vector& other) noexcept {
+            if (this == &other) {
+                return *this;
+            }
+
+            for (size_t i = 0; i < this->_size; ++i) {
+                this->_data[i].~T();
+            }
+
+            kstl_globals::free(this->_data);
+
+            this->_size = other._size;
+            this->_capacity = other._capacity;
+
+            this->_data = reinterpret_cast<T*>(
+                kstl_globals::malloc(sizeof(T) * this->_capacity)
+            );
+
+            for (size_t i = 0; i < this->_size; ++i) {
+                new (&this->_data[i]) T(other._data[i]);
+            }
+
+            return *this;
+        }
+
+        vector& operator=(vector &&v) noexcept {
+            if (this == &v) return;
+
+            for (size_t i = 0; i < this->_size; ++i) {
+                this->_data[i].~T();
+            }
+
+            kstl_globals::free(this->_data);
+
+            this->_size = v._size;
+            this->_capacity = v._capacity;
+            this->_data = v._data;
+
+            v._data = nullptr;
+            v._capacity = 0;
+            v._size = 0;
+
+            return *this;
+        }
+    public:
         T* data() const noexcept {
             return this->_data;
+        }
+
+        T& front() noexcept {
+            return this->_data[0];
+        }
+
+        const T& front() const noexcept {
+            return this->_data[0];
+        }
+
+        T& back() noexcept {
+            return this->_data[this->_size - 1];
+        }
+
+        const T& back() const noexcept {
+            return this->_data[this->_size - 1];
         }
     public:
         iterator begin() noexcept {
