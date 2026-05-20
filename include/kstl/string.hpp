@@ -63,6 +63,12 @@ namespace kstd {
 
         char& operator[](size_t index) noexcept;
         const char& operator[](size_t index) const noexcept;
+
+        bool operator==(const string &other) const noexcept;
+        bool operator==(const char *s) const noexcept;
+
+        bool operator!=(const string &other) const noexcept;
+        bool operator!=(const char *s) const noexcept;
     public:
         string();
         string(const char *data);

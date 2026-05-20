@@ -171,6 +171,23 @@ namespace kstd {
 
             return *this;
         }
+
+        bool operator==(const vector &other) const noexcept {
+            if (&other == this) return true;
+            if (other._size != this) return false;
+
+            for (size_t i = 0; i < this->_size; ++i) {
+                if (this->_data[i] != other._data[i]) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        bool operator!=(const vector &other) const noexcept {
+            return !(this == *other);
+        }
     public:
         T* data() const noexcept {
             return this->_data;

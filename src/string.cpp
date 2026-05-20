@@ -12,8 +12,9 @@ namespace kstl_globals {
 namespace kstd {
     char null_terminator = '\0';
 
-    string::string() {
-    }
+    bool streq_2n(const char *s1, const char *s2, size_t s1_len, size_t s2_len);
+
+    string::string() {}
 
     string::string(const char *data) {
 this->_size = strlen(data);
@@ -330,6 +331,23 @@ this->_size = strlen(data);
         return this->_data[index];
     }
 
+    bool string::operator==(const string &other) const noexcept {
+        if (this == &other) return true;
+        return streq_2n(this->_data, other._data, this->_size, other._size);
+    }
+
+    bool string::operator==(const char *s) const noexcept {
+        return streq_2n(this->_data, s, this->_size, strlen(s));
+    }
+
+    bool string::operator!=(const string &other) const noexcept {
+        return !(*this == other);
+    }
+
+    bool string::operator!=(const char *s) const noexcept {
+        return !(*this == s);
+    }
+
     string::string(const string &s) {
         this->_size = s._size;
         this->_capacity = s._capacity;
@@ -351,6 +369,14 @@ this->_size = strlen(data);
         if (this->_data != nullptr) {
             kstl_globals::free(this->_data);
         }
+    }
+
+    bool operator==(const char *lhs, const string &rhs) {
+        return rhs == lhs;
+    }
+
+    bool operator!=(const char *lhs, const string &rhs) {
+        return rhs != lhs;
     }
 
     size_t strlen(const char *s) {
@@ -396,6 +422,21 @@ this->_size = strlen(data);
         size_t s1_len = strlen(s1);
         size_t s2_len = strlen(s2);
 
+        if (s1_len != s2_len) {
+            return false;
+        }
+
+        // s1 && s2 are same length
+        for (size_t i = 0; i < s1_len; ++i) {
+            if (s1[i] != s2[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool streq_2n(const char *s1, const char *s2, size_t s1_len, size_t s2_len) {
         if (s1_len != s2_len) {
             return false;
         }
