@@ -30,6 +30,7 @@ target_link_libraries(tester PRIVATE kstl)
 
 set(TEST_NAMES
     string/basic
+    string/cstring
 
     vector/basic
     vector/iterators

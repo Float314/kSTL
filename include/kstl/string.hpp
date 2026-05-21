@@ -83,4 +83,8 @@ namespace kstd {
     char* strcpy(char *__restrict dst, char *__restrict src);
     char* strncpy(char *__restrict dst, const char *__restrict src, size_t dest_size);
     bool streq(const char *s1, const char *s2);
+
+    // TODO: Implement these two
+    int stoi(const string &s);
+    string to_string(int v);
 }

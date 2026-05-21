@@ -96,13 +96,13 @@ namespace kstd {
             this->_size--;
         }
 
-        void reserve(size_t bytes) noexcept {    
-            if (bytes < this->_capacity) {
+        void reserve(size_t elements) noexcept {    
+            if (elements < this->_capacity) {
                 return;
             }
 
             size_t old_capacity = this->_capacity;
-            this->_capacity *= kstd::max(bytes, _capacity * 2);
+            this->_capacity *= kstd::max(elements, _capacity * 2);
             T *new_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
             kstd::memcpy(new_data, this->_data, sizeof(T) * old_capacity);
             kstl_globals::free(this->_data);

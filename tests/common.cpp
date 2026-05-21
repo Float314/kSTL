@@ -2,7 +2,7 @@
 #include "kstl/runtime.hpp"
 #include <cstdlib>
 #include <cstdio>
-#include <iostream>
+#include <format>
 
 namespace std {
     void terminate(void) noexcept;
@@ -10,6 +10,9 @@ namespace std {
 
 size_t g_memory_allocated = 0;
 size_t g_memory_allocations = 0;
+
+size_t g_total_allocations = 0;
+size_t g_total_mem_allocated = 0;
 
 namespace kstl_globals {
     extern kstd::rt_init g_init_data;
@@ -27,6 +30,8 @@ namespace kstl::test {
                     printf("[A]: %zu bytes -> %p\n", size, reinterpret_cast<void*>((char*) mem + sizeof(header)));
                     g_memory_allocated += size;
                     g_memory_allocations += 1;
+                    ++g_total_allocations;
+                    g_total_mem_allocated += size;
                     ((header*) mem)->sz = size;
                     return reinterpret_cast<void*>((char*) mem + sizeof(header));
                 },
@@ -54,6 +59,9 @@ namespace kstl::test {
         printf("--- Memory Status ---\n");
         printf("Unfreed Memory: %zu bytes\n", g_memory_allocated);
         printf("Unfreed Allocations: %zu\n", g_memory_allocations);
+        printf("\n");
+        printf("Total Memory Allocated: %zu bytes\n", g_total_mem_allocated);
+        printf("Total Memory Allocations: %zu\n", g_total_allocations);
         printf("--- ------------- ---\n");
     }
 
