@@ -52,7 +52,7 @@ namespace kstd {
         void push_back(const T &elm) noexcept {
             if (this->_data == nullptr) {
                 this->_capacity = 1;
-                this->_size = 1;
+                this->_size = 0;
                 this->_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
             }
 
@@ -71,7 +71,7 @@ namespace kstd {
         void push_back(T &&elm) noexcept {
             if (this->_data == nullptr) {
                 this->_capacity = 1;
-                this->_size = 1;
+                this->_size = 0;
                 this->_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
             }
 
@@ -96,10 +96,18 @@ namespace kstd {
             this->_size--;
         }
 
-        void reserve(size_t elements) noexcept {    
+        void reserve(size_t elements) noexcept {
+            if (this->_data == nullptr) {
+                this->_capacity = 1;
+                this->_size = 0;
+                this->_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
+            }
+
             if (elements < this->_capacity) {
                 return;
             }
+
+            // if (this->_data == nullptr) { asm volatile ("ud2"); }
 
             size_t old_capacity = this->_capacity;
             this->_capacity *= kstd::max(elements, _capacity * 2);
@@ -107,6 +115,37 @@ namespace kstd {
             kstd::memcpy(new_data, this->_data, sizeof(T) * old_capacity);
             kstl_globals::free(this->_data);
             this->_data = new_data;
+        }
+
+        void resize(size_t elements) {
+            if (this->_data == nullptr) {
+                this->_capacity = 1;
+                this->_size = 0;
+                this->_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
+            }
+
+            T* new_data =
+                reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * elements));
+
+            size_t copy_count = (elements < _size) ? elements : _size;
+
+            for (size_t i = 0; i < copy_count; ++i) {
+                new (&new_data[i]) T(kstd::move(_data[i]));
+            }
+
+            for (size_t i = copy_count; i < elements; ++i) {
+                new (&new_data[i]) T();
+            }
+
+            for (size_t i = 0; i < _size; ++i) {
+                _data[i].~T();
+            }
+
+            kstl_globals::free(_data);
+
+            _data = new_data;
+            _size = elements;
+            _capacity = elements;
         }
 
         void shrink_to_fit() noexcept {
