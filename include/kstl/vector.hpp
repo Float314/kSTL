@@ -60,7 +60,9 @@ namespace kstd {
                 size_t old_capacity = this->_capacity;
                 this->_capacity *= 2;
                 T *new_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
-                kstd::memcpy(new_data, this->_data, sizeof(T) * old_capacity);
+                for (size_t i = 0; i < old_capacity; ++i) {
+                    new (new_data[i]) T(kstd::move(this->_data[i]));
+                }
                 kstl_globals::free(this->_data);
                 this->_data = new_data;
             }
@@ -79,7 +81,9 @@ namespace kstd {
                 size_t old_capacity = this->_capacity;
                 this->_capacity *= 2;
                 T *new_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
-                kstd::memcpy(new_data, this->_data, sizeof(T) * old_capacity);
+                for (size_t i = 0; i < old_capacity; ++i) {
+                    new (new_data[i]) T(kstd::move(this->_data[i]));
+                }
                 kstl_globals::free(this->_data);
                 this->_data = new_data;
             }
@@ -112,7 +116,9 @@ namespace kstd {
             size_t old_capacity = this->_capacity;
             this->_capacity *= kstd::max(elements, _capacity * 2);
             T *new_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
-            kstd::memcpy(new_data, this->_data, sizeof(T) * old_capacity);
+            for (size_t i = 0; i < old_capacity; ++i) {
+                new (new_data[i]) T(kstd::move(this->_data[i]));
+            }
             kstl_globals::free(this->_data);
             this->_data = new_data;
         }
@@ -150,9 +156,12 @@ namespace kstd {
 
         void shrink_to_fit() noexcept {
             if (this->_capacity > this->_size) {
+                size_t old_capacity = this->_capacity;
                 this->_capacity = this->_size;
                 T *new_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
-                kstd::memcpy(new_data, this->_data, sizeof(T) * this->_capacity);
+                for (size_t i = 0; i < old_capacity; ++i) {
+                    new (new_data[i]) T(kstd::move(this->_data[i]));
+                }
                 kstl_globals::free(this->_data);
                 this->_data = new_data;
             }
