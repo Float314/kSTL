@@ -1,5 +1,6 @@
 #pragma once
 
+#include <concepts>
 #include <initializer_list>
 #include <new>
 #include "kstl/types.hpp"
@@ -24,6 +25,22 @@ namespace kstd {
         T *_data = nullptr;
         size_t _size = 0;
         size_t _capacity = 0;
+    private:
+        void grow() noexcept {
+            this->_capacity *= 2;
+
+            T* new_data = reinterpret_cast<T*>(
+                kstl_globals::malloc(sizeof(T) * this->_capacity)
+            );
+
+            for (size_t i = 0; i < this->_size; ++i) {
+                new (&new_data[i]) T(kstd::move(this->_data[i]));
+                this->_data[i].~T();
+            }
+
+            kstl_globals::free(this->_data);
+            this->_data = new_data;
+        }
     public:
         size_t size() const noexcept {
             return this->_size;
@@ -57,17 +74,10 @@ namespace kstd {
             }
 
             if (this->_size + 1 > this->_capacity) {
-                size_t old_capacity = this->_capacity;
-                this->_capacity *= 2;
-                T *new_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
-                for (size_t i = 0; i < old_capacity; ++i) {
-                    new (new_data[i]) T(kstd::move(this->_data[i]));
-                }
-                kstl_globals::free(this->_data);
-                this->_data = new_data;
+                grow();
             }
 
-            new (this->_data + this->_size++) T(elm);
+            new (this->_data + this->_size++) T(kstd::move(elm));
         }
 
         void push_back(T &&elm) noexcept {
@@ -78,17 +88,25 @@ namespace kstd {
             }
 
             if (this->_size + 1 > this->_capacity) {
-                size_t old_capacity = this->_capacity;
-                this->_capacity *= 2;
-                T *new_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
-                for (size_t i = 0; i < old_capacity; ++i) {
-                    new (new_data[i]) T(kstd::move(this->_data[i]));
-                }
-                kstl_globals::free(this->_data);
-                this->_data = new_data;
+                grow();
             }
 
-            new (this->_data + this->_size++) T(elm);
+            new (this->_data + this->_size++) T(kstd::move(elm));
+        }
+
+        template<typename... Args>
+        void emplace_back(Args&&... args) noexcept {
+            if (this->_data == nullptr) {
+                this->_capacity = 1;
+                this->_size = 0;
+                this->_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
+            }
+
+            if (this->_size + 1 > this->_capacity) {
+                grow();
+            }
+
+            new (this->_data + this->_size++) T(kstd::forward<Args>(args)...);
         }
 
         void pop_back() noexcept {
@@ -114,10 +132,10 @@ namespace kstd {
             // if (this->_data == nullptr) { asm volatile ("ud2"); }
 
             size_t old_capacity = this->_capacity;
-            this->_capacity *= kstd::max(elements, _capacity * 2);
+            this->_capacity = kstd::max(elements, _capacity * 2);
             T *new_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
             for (size_t i = 0; i < old_capacity; ++i) {
-                new (new_data[i]) T(kstd::move(this->_data[i]));
+                new (&new_data[i]) T(kstd::move(this->_data[i]));
             }
             kstl_globals::free(this->_data);
             this->_data = new_data;
@@ -160,7 +178,7 @@ namespace kstd {
                 this->_capacity = this->_size;
                 T *new_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
                 for (size_t i = 0; i < old_capacity; ++i) {
-                    new (new_data[i]) T(kstd::move(this->_data[i]));
+                    new (&new_data[i]) T(kstd::move(this->_data[i]));
                 }
                 kstl_globals::free(this->_data);
                 this->_data = new_data;
@@ -275,7 +293,7 @@ namespace kstd {
     public:
         vector() = default;
 
-        vector(const vector &v) {
+        vector(const vector &v) requires std::copy_constructible<T> {
             this->_size = v._size;
             this->_capacity = v._capacity;
             this->_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));

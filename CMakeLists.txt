@@ -36,6 +36,7 @@ set(TEST_NAMES
     vector/iterators
     vector/edge_case_indexing
     vector/resize_and_reserve
+    vector/move_only_type
 
     unique_ptr/basic
 
