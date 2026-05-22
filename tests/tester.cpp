@@ -2,6 +2,8 @@
 #include <chrono>
 #include <filesystem>
 #include <iostream>
+#include <sstream>
+#include <string>
 #include <thread>
 
 #if defined(__linux__) || defined(__linux)
@@ -10,12 +12,32 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 extern char **environ;
+
+std::string repeat(char c, int n) {
+    std::string s;
+    s.reserve(n);
+    for (int i = 0; i < n; ++i) {
+        s.push_back(c);
+    }
+    return s;
+}
+
+#define KSTL_PRETTY_TEST_RUNNER
+
 int main() {
     std::cout << "\e[38;5;220m[[ kSTL Unit Tests ]]\e[0m\n";
 
     int dev_null = open("/dev/null", O_WRONLY);
     int passed = 0;
     int failed = 0;
+    std::ostringstream output;
+    std::string progress = "";
+    int total_tests = 0;
+    for (auto &entry : std::filesystem::recursive_directory_iterator("bin/tests")) {
+        if (entry.is_regular_file()) {
+            ++total_tests;
+        }
+    }
     for (auto &entry : std::filesystem::recursive_directory_iterator("bin/tests")) {
         if (entry.is_regular_file()) {
             pid_t child;
@@ -29,23 +51,42 @@ int main() {
             auto path = entry.path();
             auto relative = path.lexically_relative("bin/tests");
 
-            std::cout << ' ' << relative.string() << '\n' << std::flush;
+            // std::cout << "\e[38;5;220m" << "[TEST]" << "\e[0m" << " " << relative.string() << std::flush;
+#ifdef KSTL_PRETTY_TEST_RUNNER
             std::this_thread::sleep_for(std::chrono::milliseconds(20));
+#endif
 
             posix_spawn(&child, path.c_str(), &actions, nullptr, args.data(), environ);
 
             int status;
             waitpid(child, &status, 0);
+            bool success = WIFEXITED(status) && WEXITSTATUS(status) == 0;
 
-            if (status != 0) {
-                std::cout << ' ' << "\e[2K\e[38;5;196m" << "Failure: " << "\e[0m" << "(exit code " << status << ")" << '\n' << std::endl;
+            if (!success) {
+                output << "\e[2K\e[38;5;196m" << "[FAIL]" << "\e[0m" << " " << relative.string() << std::endl;
                 ++failed;
             } else {
-                std::cout << ' ' << "\e[2K\e[38;5;154mSuccess\e[0m" << '\n' << std::endl;
+                output << "\e[2K\e[38;5;154m" << "[PASS]" << "\e[0m" << " " << relative.string() << std::endl;
                 ++passed;
             }
+
+            constexpr int fixed_width = 20;
+            int done = passed + failed;
+            int filled = done * fixed_width / total_tests;
+
+            progress = "[" + repeat('#', filled) + repeat(' ', fixed_width - filled) + "]";
+            std::cout << "\r" << progress << "\e[0m" << std::flush;
+
+            posix_spawn_file_actions_destroy(&actions);
         }
     }
+
+#ifdef KSTL_PRETTY_TEST_RUNNER
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+#endif
+
+    std::cout << '\r';
+    std::cout << output.str();
 
     std::cout << "--> \e[38;5;220mResults\e[0m <--\n";
     std::cout << "\e[38;5;196m" << "Failed: " << "\e[0m" << failed << '\n';
