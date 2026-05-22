@@ -219,7 +219,7 @@ namespace kstd {
         }
 
         vector& operator=(vector &&v) noexcept {
-            if (this == &v) return;
+            if (this == &v) return *this;
 
             for (size_t i = 0; i < this->_size; ++i) {
                 this->_data[i].~T();

@@ -66,7 +66,7 @@ namespace kstd {
         }
 
         optional& operator=(const optional &other) noexcept {
-            if (this == &other) return;
+            if (this == &other) return *this;
 
             if (this->_has_value) {
                 this->ptr()->~T();
@@ -83,7 +83,7 @@ namespace kstd {
         }
 
         optional& operator=(optional &&other) noexcept {
-            if (this == other) return;
+            if (this == other) return *this;
 
             if (this->_has_value) {
                 this->ptr()->~T();

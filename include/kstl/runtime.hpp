@@ -101,12 +101,12 @@ namespace kstd {
                 : true;
         }
     public:
-        error_code<void>() = default;
-        error_code<void>(type_wrapper<void> value, error_category category) {
+        error_code() = default;
+        error_code(type_wrapper<void> value, error_category category) {
             this->_value = value;
             this->_category = category;
         }
-        ~error_code<void>() = default;
+        ~error_code() = default;
     };
 
     [[nodiscard]] error_code<void> init(const rt_init &init_data);
