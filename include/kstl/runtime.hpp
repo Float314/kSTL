@@ -23,18 +23,18 @@ namespace kstd {
     struct type_wrapper {
         T _value;
         operator T() const { return this->_value; }
-        type_wrapper<T> operator=(const T &value) {
+        type_wrapper operator=(const T &value) {
             this->_value = value;
             return *this;
         }
-        type_wrapper<T>() = default;
-        type_wrapper<T>(const T &value) {
+        type_wrapper() = default;
+        type_wrapper(const T &value) {
             this->_value = value;
         };
-        type_wrapper<T>(T &value) {
+        type_wrapper(T &value) {
             this->_value = value;
         }
-        ~type_wrapper<T>() = default;
+        ~type_wrapper() = default;
     };
 
     template<>
@@ -67,12 +67,12 @@ namespace kstd {
                 : true;
         }
     public:
-        error_code<T>() = default;
-        error_code<T>(type_wrapper<T> value, error_category category) {
+        error_code() = default;
+        error_code(type_wrapper<T> value, error_category category) {
             this->_value = value;
             this->_category = category;
         }
-        ~error_code<T>() = default;
+        ~error_code() = default;
     };
 
 
