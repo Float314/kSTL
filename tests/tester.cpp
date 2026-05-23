@@ -91,6 +91,8 @@ int main() {
     std::cout << "--> \e[38;5;220mResults\e[0m <--\n";
     std::cout << "\e[38;5;196m" << "Failed: " << "\e[0m" << failed << '\n';
     std::cout << "\e[38;5;154m" << "Passed: " << "\e[0m" << passed << '\n';
+
+    return failed;
 }
 #else
 int main() {
