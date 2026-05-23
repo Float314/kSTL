@@ -65,9 +65,11 @@ namespace kstl::test {
         printf("--- ------------- ---\n");
     }
 
-    void expect(bool expectation, const char *condition) {
+    void expect(bool expectation, const char *condition, const char *file, int line_number) {
+        if (file == nullptr)
+            file = "Unknown";
         if (!expectation) {
-            log("EXPECTATION FAILURE", std::format("{}", condition));
+            log("Assertion Failed", std::format("{} @ {}:{}", condition, file, line_number));
             end();
             fflush(stdout);
             fflush(stderr);

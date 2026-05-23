@@ -22,6 +22,12 @@ namespace kstd {
 
         char& at(size_t index) noexcept;
         const char& at(size_t index) const noexcept;
+
+        char& front() noexcept;
+        const char& front() const noexcept;
+
+        char& back() noexcept;
+        const char& back() const noexcept;
     public:
         void append(char c) noexcept;
         void append(char *str) noexcept;

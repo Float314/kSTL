@@ -61,6 +61,8 @@ if (KSTL_TESTS)
     set(TEST_NAMES
         string/basic
         string/cstring
+        string/edge_case_indexing
+        string/iterators
 
         vector/basic
         vector/iterators

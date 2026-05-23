@@ -157,6 +157,38 @@ this->_size = strlen(data);
         return this->_data[index];
     }
 
+    char& string::front() noexcept {
+        if (0 >= this->_size) {
+            kstl_globals::g_init_data.panic();
+        }
+
+        return this->_data[0];
+    }
+
+    const char& string::front() const noexcept {
+        if (0 >= this->_size) {
+            kstl_globals::g_init_data.panic();
+        }
+
+        return this->_data[0];
+    }
+
+    char& string::back() noexcept {
+        if (this->_size - 1 < 0) {
+            kstl_globals::g_init_data.panic();
+        }
+
+        return this->_data[this->_size - 1];
+    }
+
+    const char& string::back() const noexcept {
+        if (this->_size - 1 < 0) {
+            kstl_globals::g_init_data.panic();
+        }
+
+        return this->_data[this->_size - 1];
+    }
+
     bool string::starts_with(char prefix) const noexcept {
         if (this->_data == nullptr || this->_size == 0) {
             return false;

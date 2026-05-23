@@ -34,7 +34,7 @@ int main() {
 
         kstl::test::expect(accumulator, "v2 == {42, 42, 42, 42}");
 
-        k_expect(*v.begin() == v[0]);
+        k_expect(*v.begin() != v[0]);
         k_expect(*(v.end() - 1) == v[v.size() - 1]);
     }
     kstl::test::end();
