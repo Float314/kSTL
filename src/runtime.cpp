@@ -21,7 +21,7 @@ namespace kstd {
             return mem;
         };
         kstl_globals::free = init_data.allocator_info.free;
-        kstl_globals::aligned_alloc = [](size_t align, size_t sz) -> void* {
+        kstl_globals::aligned_alloc = [](size_t /* align */, size_t sz) -> void* {
             return kstl_globals::g_init_data.allocator_info.alloc(sz);
         }; 
 

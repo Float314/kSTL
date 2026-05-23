@@ -7,13 +7,6 @@ namespace kstl_globals {
 
 namespace kstd {
     void memcpy(void *__restrict dst, const void *__restrict src, size_t bytes) {
-        if (bytes == 0) return;
-        if (dst == nullptr || src == nullptr) {
-            kstl_globals::g_init_data.panic();
-        }
-
-        for (size_t i = 0; i < bytes; ++i) {
-            *(reinterpret_cast<char*>(dst) + i) = *(reinterpret_cast<const char*>(src) + i);
-        }
+        __builtin_memcpy(dst, src, bytes); // ok
     }
 }
