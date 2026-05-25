@@ -60,8 +60,7 @@ namespace kstd {
     struct is_array<T[]> {
         static constexpr bool value = true;
     };
-
-    
+ 
     template<typename T, size_t N>
     struct is_array<T[N]> {
         static constexpr bool value = true;
@@ -69,4 +68,22 @@ namespace kstd {
 
     template<typename T>
     inline constexpr bool is_array_v = is_array<T>::value;
+
+    template<typename T>
+    struct type_identity {
+        using type = T;
+    };
+
+    template<typename T>
+    using type_identity_t = typename type_identity<T>::type;
+
+    template<typename Destination>
+    constexpr Destination implicit_cast(type_identity_t<Destination> src) {
+        return src;
+    }
+
+    template<typename Destination, typename Source>
+    constexpr Destination pun_cast(const Source &val) {
+        return __builtin_bit_cast(Destination, val);
+    }
 }

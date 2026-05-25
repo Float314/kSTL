@@ -13,7 +13,7 @@ typedef unsigned int       uint32_t;
 typedef signed long int64_t;
 typedef unsigned long uint64_t;
 
-typedef unsigned long size_t;
+typedef __SIZE_TYPE__ size_t;
 
 // Pointer-sized integer types
 #if defined(__x86_64__) || defined(_M_X64)

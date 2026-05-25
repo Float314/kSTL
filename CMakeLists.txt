@@ -12,10 +12,18 @@ set(CMAKE_BUILD_TYPE Debug)
 option(BUILD_SHARED_LIBS "Build as a Shared Library" ON)
 option(KSTL_FREESTANDING "Build as a Freestanding Static Library" OFF)
 option(KSTL_TESTS "Build Tests" ON)
+option(KSTL_FREESTANDING_X86 "Build as 32-bit x86" OFF)
 
-set(KSTL_COMPILER_FLAGS -Wall -Wextra -Wpedantic -Werror=return-type -Werror=uninitialized -Werror=nonnull -Werror=null-dereference -Werror=strict-aliasing -Werror=undef -Werror=sign-compare -fno-omit-frame-pointer)
+set(KSTL_COMPILER_FLAGS -Wall -Wextra -Wpedantic -Werror=return-type -Werror=uninitialized -Werror=nonnull -Werror=null-dereference -Werror=strict-aliasing -Werror=undef -Werror=sign-compare -fno-omit-frame-pointer -fno-pic -fno-pie)
 
 if (KSTL_FREESTANDING)
+    if (KSTL_FREESTANDING_X86)
+        message(STATUS "Builting as 32-bit x86")
+        set(KSTL_COMPILER_FLAGS -m32 ${KSTL_COMPILER_FLAGS})
+        add_link_options(
+            -m32
+        )
+    endif()
     set(BUILD_SHARED_LIBS OFF)
     set(KSTL_TESTS OFF)
     message(STATUS "Building in Freestanding Mode")
@@ -30,6 +38,10 @@ if (KSTL_FREESTANDING)
         -nodefaultlibs
         -mno-red-zone
         -fno-stack-protector
+    )
+
+    add_link_options(
+        -no-pie
     )
 endif()
 

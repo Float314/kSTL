@@ -109,13 +109,27 @@ namespace kstd {
         }
     };
 
+    // template<typename T, typename... Args>
+    // unique_ptr<T> make_unique(Args&&... args) {
+    //     T *ptr = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T)));
+    //     if (ptr == nullptr) {
+    //         kstl_globals::g_init_data.panic();
+    //     }
+    //     new (ptr) T(kstd::forward<Args>(args)...);
+    //     return unique_ptr<T>(ptr);
+    // }
+
     template<typename T, typename... Args>
     unique_ptr<T> make_unique(Args&&... args) {
-        T *ptr = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T)));
-        if (ptr == nullptr) {
+        void* mem = kstl_globals::malloc(sizeof(T));
+
+        if (!mem) {
             kstl_globals::g_init_data.panic();
         }
+
+        T* ptr = static_cast<T*>(mem);
         new (ptr) T(kstd::forward<Args>(args)...);
+
         return unique_ptr<T>(ptr);
     }
 
