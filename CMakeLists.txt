@@ -14,7 +14,7 @@ option(KSTL_FREESTANDING "Build as a Freestanding Static Library" OFF)
 option(KSTL_TESTS "Build Tests" ON)
 option(KSTL_FREESTANDING_X86 "Build as 32-bit x86" OFF)
 
-set(KSTL_COMPILER_FLAGS -Wall -Wextra -Wpedantic -Werror=return-type -Werror=uninitialized -Werror=nonnull -Werror=null-dereference -Werror=strict-aliasing -Werror=undef -Werror=sign-compare -fno-omit-frame-pointer -fno-pic -fno-pie)
+set(KSTL_COMPILER_FLAGS -Wall -Wextra -Wpedantic -Werror=return-type -Werror=uninitialized -Werror=nonnull -Werror=null-dereference -Werror=strict-aliasing -Werror=undef -Werror=sign-compare -fno-omit-frame-pointer)
 
 if (KSTL_FREESTANDING)
     if (KSTL_FREESTANDING_X86)
@@ -38,6 +38,8 @@ if (KSTL_FREESTANDING)
         -nodefaultlibs
         -mno-red-zone
         -fno-stack-protector
+        -fno-pic
+        -fno-pie
     )
 
     add_link_options(
