@@ -123,7 +123,7 @@ namespace kstd {
             return *this->ptr();
         }
 
-        T& operator->() noexcept {
+        T* operator->() noexcept {
             if (!_has_value) {
                 kstl_globals::g_init_data.panic();
             }
@@ -131,7 +131,7 @@ namespace kstd {
             return this->ptr();
         }
 
-        const T& operator->() const noexcept {
+        const T* operator->() const noexcept {
             if (!_has_value) {
                 kstl_globals::g_init_data.panic();
             }
