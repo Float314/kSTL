@@ -142,7 +142,7 @@ namespace kstd {
         optional() {}
 
         template<typename... Args>
-        optional(Args... args) {
+        optional(in_place_t, Args&&... args) {
             new (this->storage) T(kstd::forward<Args>(args)...);
             this->_has_value = true;
         }

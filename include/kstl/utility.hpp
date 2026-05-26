@@ -86,4 +86,9 @@ namespace kstd {
     constexpr Destination pun_cast(const Source &val) {
         return __builtin_bit_cast(Destination, val);
     }
+
+    struct in_place_t {
+        explicit in_place_t() = default;
+    };
+    inline constexpr in_place_t in_place{};
 }
