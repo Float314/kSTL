@@ -37,7 +37,15 @@ namespace kstd {
             return this->_has_value;
         }
 
-        T value() const noexcept {
+        const T& value() const noexcept {
+            if (this->_has_value) {
+                return *this->ptr();
+            }
+
+            kstl_globals::g_init_data.panic();
+        }
+
+        T& value() noexcept {
             if (this->_has_value) {
                 return *this->ptr();
             }
