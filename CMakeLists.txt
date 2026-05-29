@@ -14,6 +14,8 @@ option(KSTL_FREESTANDING "Build as a Freestanding Static Library" OFF)
 option(KSTL_TESTS "Build Tests" ON)
 option(KSTL_FREESTANDING_X86 "Build as 32-bit x86" OFF)
 
+option(KSTL_FLOATING_POINT_SUPPORTED "Support floating-point ")
+
 set(KSTL_COMPILER_FLAGS -Wall -Wextra -Wpedantic -Werror=return-type -Werror=uninitialized -Werror=nonnull -Werror=null-dereference -Werror=strict-aliasing -Werror=undef -Werror=sign-compare -fno-omit-frame-pointer)
 
 if (KSTL_FREESTANDING)
@@ -83,6 +85,8 @@ if (KSTL_TESTS)
         vector/edge_case_indexing
         vector/resize_and_reserve
         vector/move_only_type
+
+        unordered_map/basic
 
         unique_ptr/basic
 

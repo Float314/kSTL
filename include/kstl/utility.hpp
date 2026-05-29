@@ -1,6 +1,8 @@
 #pragma once
 
 #include "types.hpp"
+#include <concepts>
+#include <compare>
 
 namespace kstd {
     template<typename T>
@@ -25,6 +27,19 @@ namespace kstd {
 
     template<typename T>
     using remove_reference_t = typename remove_reference<T>::type;
+
+    template<typename T>
+    struct remove_const {
+        using type = T;
+    };
+
+    template<typename T>
+    struct remove_const<const T> {
+        using type = T;
+    };
+
+    template<typename T>
+    using remove_const_t = typename remove_const<T>::type;
 
     template<typename T>
     constexpr T&& forward(remove_reference_t<T> &arg) noexcept {
@@ -85,5 +100,52 @@ namespace kstd {
     template<typename Destination, typename Source>
     constexpr Destination pun_cast(const Source &val) {
         return __builtin_bit_cast(Destination, val);
+    }
+
+    template<typename T, typename U>
+    struct pair {
+        T first;
+        U second;
+
+        auto operator<=>(const pair &other) const noexcept = default;
+        bool operator==(const pair &other) const noexcept = default;
+        pair& operator=(const pair &other) noexcept {
+            if (this == &other) return *this;
+
+            this->first = other.first;
+            this->second = other.second;
+
+            return *this;
+        }
+        pair& operator=(pair &&other) noexcept
+        requires std::move_constructible<T> && 
+                 std::move_constructible<U>
+        {
+            if (this == &other) return *this;
+
+            this->first = kstd::move(other.first);
+            this->second = kstd::move(other.second);
+
+            return *this;
+        }
+
+        pair() = default;
+        pair(const T &first, const T &second) : first(first)
+                                              , second(second) 
+        {}
+        pair(T &&first, T &&second) : first(kstd::move(first))
+                                    , second(kstd::move(second)) 
+        {}
+        ~pair() = default;
+    };
+
+    template<typename T, typename U>
+    pair<T, U> make_pair(const T &first, const T &second) {
+        return pair<T, U> { first, second };
+    }
+
+    template<typename T, typename U>
+    pair<T, U> make_pair(T &&first, T &&second) {
+        return pair<T, U> { first, second };
     }
 }
