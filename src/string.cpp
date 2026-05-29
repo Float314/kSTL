@@ -482,4 +482,12 @@ this->_size = strlen(data);
 
         return true;
     }
+
+    void memcpy(void *__restrict dst, const void *__restrict src, size_t bytes) {
+        __builtin_memcpy(dst, src, bytes);
+    }
+
+    void memset(void *s, int c, size_t n) {
+        __builtin_memset(s, c, n);
+    }
 }

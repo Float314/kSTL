@@ -1,5 +1,7 @@
 #pragma once
 
+// C-Compatible Header File
+
 // Fixed-width integer types
 typedef signed char        int8_t;
 typedef unsigned char      uint8_t;
@@ -10,8 +12,8 @@ typedef unsigned short     uint16_t;
 typedef signed int         int32_t;
 typedef unsigned int       uint32_t;
 
-typedef signed long int64_t;
-typedef unsigned long uint64_t;
+typedef __INT64_TYPE__     int64_t;
+typedef __UINT64_TYPE__    uint64_t;
 
 typedef __SIZE_TYPE__ size_t;
 
@@ -24,7 +26,7 @@ typedef int32_t  intptr_t;
 typedef uint32_t uintptr_t;
 #endif
 
-// Limits (optional but useful)
+// Limits
 #ifndef INT16_MIN
 #define INT16_MIN  (-32768)
 #endif
@@ -53,4 +55,19 @@ typedef uint32_t uintptr_t;
 #endif
 #ifndef UINT64_MAX
 #define UINT64_MAX 18446744073709551615ULL
+#endif
+
+#ifdef __cplusplus
+namespace kstd {
+    using uint8_t   = ::uint8_t;
+    using uint16_t  = ::uint16_t;
+    using uint32_t  = ::uint32_t;
+    using uint64_t  = ::uint64_t;
+    using int8_t    = ::int8_t;
+    using int16_t   = ::int16_t;
+    using int32_t   = ::int32_t;
+    using int64_t   = ::int64_t;
+
+    using size_t    = ::size_t;
+}
 #endif

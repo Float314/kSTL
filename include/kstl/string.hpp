@@ -93,4 +93,7 @@ namespace kstd {
     // TODO: Implement these two
     int stoi(const string &s);
     string to_string(int v);
+
+    void memcpy(void *__restrict dst, const void *__restrict src, size_t bytes);
+    void memset(void *s, int c, size_t n);
 }
