@@ -188,8 +188,4 @@ namespace kstd {
             kstl_globals::free(this->nodes);
         }
     };
-    
-    void x() {
-        unordered_map<int, float> map;
-    }
 }

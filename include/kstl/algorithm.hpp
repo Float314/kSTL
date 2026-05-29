@@ -26,9 +26,9 @@ namespace kstd {
     template<typename It, typename UnaryPred>
     bool all_of(It first, It last, UnaryPred p) {
         for (; first != last; ++first) {
-            if(!p(*first)) {
+            if (!p(*first)) {
                 return false;
-            };
+            }
         }
         return true;
     };
@@ -36,9 +36,9 @@ namespace kstd {
     template<class It, class UnaryPred>
     bool any_of(It first, It last, UnaryPred p) {
         for (; first != last; ++first) {
-            if(p(*first)) {
+            if (p(*first)) {
                 return true;
-            };
+            }
         }
         return false;
     };
@@ -67,7 +67,8 @@ namespace kstd {
     template<typename It, typename T>
     It find_if(It begin, It end, T comp) {
         for (; begin != end; ++begin) {
-            if(comp(*begin)) return begin;
+            if (comp(*begin))
+                return begin;
         }
 
         return end;
@@ -76,7 +77,8 @@ namespace kstd {
     template<typename It, typename T>
     It find_if_not(It begin, It end, T comp) {
         for (; begin != end; ++begin) {
-            if(!comp(*begin)) return begin;
+            if (!comp(*begin))
+                return begin;
         }
 
         return end;
