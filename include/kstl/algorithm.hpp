@@ -23,26 +23,32 @@ namespace kstd {
         return cmp(a, b) ? a : b;
     }
     
-    template<typename InputIt, typename UnaryPred>
-    bool all_of( InputIt first, InputIt last, UnaryPred p ) {
+    template<typename It, typename UnaryPred>
+    bool all_of(It first, It last, UnaryPred p) {
         for (; first != last; ++first) {
-            if(!p(*first)) return false;
+            if(!p(*first)) {
+                return false;
+            };
         }
         return true;
     };
 
-    template< class InputIt, class UnaryPred >
-    bool any_of( InputIt first, InputIt last, UnaryPred p ) {
+    template<class It, class UnaryPred>
+    bool any_of(It first, It last, UnaryPred p) {
         for (; first != last; ++first) {
-            if(p(*first)) return true;
+            if(p(*first)) {
+                return true;
+            };
         }
         return false;
     };
 
-    template< class InputIt, class UnaryPred >
-    bool none_of( InputIt first, InputIt last, UnaryPred p ) {
+    template<class It, class UnaryPred>
+    bool none_of(It first, It last, UnaryPred p) {
         for (; first != last; ++first) {
-            if(p(*first)) return false;
+            if(p(*first)) {
+                return false;
+            };
         }
         return true;
     };
