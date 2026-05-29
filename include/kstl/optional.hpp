@@ -11,6 +11,12 @@ namespace kstl_globals {
 }
 
 namespace kstd {
+    struct nullopt_t {
+      explicit nullopt_t() = default;
+    };
+
+    inline constexpr nullopt_t nullopt{};
+
     template<typename T>
     class optional {
     private:
@@ -140,6 +146,8 @@ namespace kstd {
         }
     public:
         optional() {}
+
+        optional(nullopt_t) {}
 
         template<typename... Args>
         optional(in_place_t, Args&&... args) {
