@@ -33,6 +33,24 @@ namespace kstd {
 
         return end;
     }
+    
+    template<typename It, typename T>
+    It find_if(It begin, It end, T comp) {
+        for (; begin != end; ++begin) {
+            if(comp(*begin)) return begin;
+        }
+
+        return end;
+    }
+    
+    template<typename It, typename T>
+    It find_if_not(It begin, It end, T comp) {
+        for (; begin != end; ++begin) {
+            if(!comp(*begin)) return begin;
+        }
+
+        return end;
+    }
 
     template<typename It, typename T>
     It count(It begin, It end, const T &val) {
