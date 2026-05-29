@@ -22,6 +22,36 @@ namespace kstd {
     constexpr const T& min(const T &a, const T &b, Compare cmp) noexcept {
         return cmp(a, b) ? a : b;
     }
+    
+    template<typename It, typename UnaryPred>
+    bool all_of(It first, It last, UnaryPred p) {
+        for (; first != last; ++first) {
+            if(!p(*first)) {
+                return false;
+            };
+        }
+        return true;
+    };
+
+    template<class It, class UnaryPred>
+    bool any_of(It first, It last, UnaryPred p) {
+        for (; first != last; ++first) {
+            if(p(*first)) {
+                return true;
+            };
+        }
+        return false;
+    };
+
+    template<class It, class UnaryPred>
+    bool none_of(It first, It last, UnaryPred p) {
+        for (; first != last; ++first) {
+            if(p(*first)) {
+                return false;
+            };
+        }
+        return true;
+    };
 
     template<typename It, typename T>
     It find(It begin, It end, const T &val) {
