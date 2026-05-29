@@ -75,7 +75,7 @@ namespace kstd {
     struct is_array<T[]> {
         static constexpr bool value = true;
     };
-
+ 
     template<typename T, size_t N>
     struct is_array<T[N]> {
         static constexpr bool value = true;
@@ -92,20 +92,24 @@ namespace kstd {
     template<typename T>
     using type_identity_t = typename type_identity<T>::type;
 
+    // Not-standard
+    // Credits: https://youtube.com/watch?v=SmlLdd1Q2V8
     template<typename Destination>
     constexpr Destination implicit_cast(type_identity_t<Destination> src) {
         return src;
     }
 
+    // Not-standard, alias to bit_cast
+    // Credits: https://youtube.com/watch?v=SmlLdd1Q2V8
     template<typename Destination, typename Source>
     constexpr Destination pun_cast(const Source &val) {
         return __builtin_bit_cast(Destination, val);
     }
 
-    struct in_place_t {
-        explicit in_place_t() = default;
-    };
-    inline constexpr in_place_t in_place{};
+    template<typename Destination, typename Source>
+    constexpr Destination bit_cast(const Source &val) {
+        return __builtin_bit_cast(Destination, val);
+    }
 
     template<typename T, typename U>
     struct pair {
@@ -123,7 +127,7 @@ namespace kstd {
             return *this;
         }
         pair& operator=(pair &&other) noexcept
-        requires std::move_constructible<T> &&
+        requires std::move_constructible<T> && 
                  std::move_constructible<U>
         {
             if (this == &other) return *this;
@@ -135,11 +139,17 @@ namespace kstd {
         }
 
         pair() = default;
-        pair(const T &first, const T &second) : first(first)
-                                              , second(second)
+        pair(const pair &other) : first(other.first)
+                                , second(other.second)
         {}
-        pair(T &&first, T &&second) : first(kstd::move(first))
-                                    , second(kstd::move(second))
+        pair(pair &&other) : first(kstd::move(other.first))
+                           , second(kstd::move(other.second))
+        {}
+        pair(const T &first, const U &second) : first(first)
+                                              , second(second) 
+        {}
+        pair(T &&first, U &&second) : first(kstd::move(first))
+                                    , second(kstd::move(second)) 
         {}
         ~pair() = default;
     };

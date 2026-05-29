@@ -87,6 +87,7 @@ if (KSTL_TESTS)
         vector/move_only_type
 
         unordered_map/basic
+        unordered_map/iterators
 
         unique_ptr/basic
 

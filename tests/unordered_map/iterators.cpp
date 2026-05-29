@@ -1,7 +1,7 @@
 #include <format>
 #include <kstl/unordered_map.hpp>
 #include <kstl/runtime.hpp>
-#include <string>
+#include <kstl/algorithm.hpp>
 #include "common.hpp"
 
 int main() {
@@ -18,7 +18,15 @@ int main() {
         hundred_map[8] = 800;
         hundred_map[9] = 900;
         hundred_map[10] = 1000;
+
+        for (auto &[k, v] : hundred_map) {
+            k_expect(k == v * 100);
+        }
+
+        k_expect(hundred_map.begin() != hundred_map.end());
+        auto start = hundred_map.begin();
+        while (++start != hundred_map.end());
+        k_expect(start == hundred_map.end());
     }
     kstl::test::end();
 }
-

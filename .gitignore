@@ -24,3 +24,5 @@ windeps/
 
 # Junk stuff
 ignore_dir/*
+
+*.old
