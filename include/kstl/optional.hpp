@@ -12,7 +12,7 @@ namespace kstl_globals {
 
 namespace kstd {
     struct nullopt_t {
-      explicit nullopt_t() = default;
+        explicit nullopt_t() = default;
     };
 
     inline constexpr nullopt_t nullopt{};
