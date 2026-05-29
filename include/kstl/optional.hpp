@@ -11,6 +11,12 @@ namespace kstl_globals {
 }
 
 namespace kstd {
+    struct nullopt_t {
+        explicit nullopt_t() = default;
+    };
+
+    inline constexpr nullopt_t nullopt{};
+
     template<typename T>
     class optional {
     private:
@@ -37,7 +43,15 @@ namespace kstd {
             return this->_has_value;
         }
 
-        T value() const noexcept {
+        const T& value() const noexcept {
+            if (this->_has_value) {
+                return *this->ptr();
+            }
+
+            kstl_globals::g_init_data.panic();
+        }
+
+        T& value() noexcept {
             if (this->_has_value) {
                 return *this->ptr();
             }
@@ -115,7 +129,7 @@ namespace kstd {
             return *this->ptr();
         }
 
-        T& operator->() noexcept {
+        T* operator->() noexcept {
             if (!_has_value) {
                 kstl_globals::g_init_data.panic();
             }
@@ -123,7 +137,7 @@ namespace kstd {
             return this->ptr();
         }
 
-        const T& operator->() const noexcept {
+        const T* operator->() const noexcept {
             if (!_has_value) {
                 kstl_globals::g_init_data.panic();
             }
@@ -133,8 +147,10 @@ namespace kstd {
     public:
         optional() {}
 
+        optional(nullopt_t) {}
+
         template<typename... Args>
-        optional(Args... args) {
+        optional(in_place_t, Args&&... args) {
             new (this->storage) T(kstd::forward<Args>(args)...);
             this->_has_value = true;
         }

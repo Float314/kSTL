@@ -75,7 +75,7 @@ namespace kstd {
     struct is_array<T[]> {
         static constexpr bool value = true;
     };
- 
+
     template<typename T, size_t N>
     struct is_array<T[N]> {
         static constexpr bool value = true;
@@ -102,6 +102,11 @@ namespace kstd {
         return __builtin_bit_cast(Destination, val);
     }
 
+    struct in_place_t {
+        explicit in_place_t() = default;
+    };
+    inline constexpr in_place_t in_place{};
+
     template<typename T, typename U>
     struct pair {
         T first;
@@ -118,7 +123,7 @@ namespace kstd {
             return *this;
         }
         pair& operator=(pair &&other) noexcept
-        requires std::move_constructible<T> && 
+        requires std::move_constructible<T> &&
                  std::move_constructible<U>
         {
             if (this == &other) return *this;
@@ -131,10 +136,10 @@ namespace kstd {
 
         pair() = default;
         pair(const T &first, const T &second) : first(first)
-                                              , second(second) 
+                                              , second(second)
         {}
         pair(T &&first, T &&second) : first(kstd::move(first))
-                                    , second(kstd::move(second)) 
+                                    , second(kstd::move(second))
         {}
         ~pair() = default;
     };
