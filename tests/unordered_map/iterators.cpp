@@ -20,7 +20,7 @@ int main() {
         hundred_map[10] = 1000;
 
         for (auto &[k, v] : hundred_map) {
-            k_expect(k == v * 100);
+            k_expect(v == k * 100);
         }
 
         k_expect(hundred_map.begin() != hundred_map.end());

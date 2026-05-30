@@ -85,6 +85,7 @@ if (KSTL_TESTS)
         vector/edge_case_indexing
         vector/resize_and_reserve
         vector/move_only_type
+        vector/reserveless_stress_allocations
 
         unordered_map/basic
         unordered_map/iterators
@@ -92,6 +93,7 @@ if (KSTL_TESTS)
         unique_ptr/basic
 
         optional/basic
+        optional/nullopt
     )
 
     add_library(log_vector STATIC

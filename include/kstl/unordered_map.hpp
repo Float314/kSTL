@@ -37,7 +37,7 @@ namespace kstd {
         size_t _size = 0;
     public:
         class const_iterator {
-        private:
+        public:
             unordered_map *container = nullptr;
             size_t bucket_idx = 0;
             node_t *current = nullptr;
@@ -51,7 +51,7 @@ namespace kstd {
             }
 
             bool operator==(const const_iterator &other) const noexcept {
-                return current = other.current;
+                return current == other.current;
             }
 
             bool operator!=(const const_iterator &other) const noexcept {
@@ -79,11 +79,11 @@ namespace kstd {
         };
 
         class iterator {
-        private:
+        public:
             unordered_map *container = nullptr;
             size_t bucket_idx = 0;
             node_t *current = nullptr;
-        public:
+
             pair<const Key, T>& operator*() const noexcept {
                 return current->value;
             }
@@ -102,7 +102,7 @@ namespace kstd {
             }
 
             bool operator==(const iterator &other) const noexcept {
-                return current = other.current;
+                return current == other.current;
             }
 
             bool operator!=(const iterator &other) const noexcept {
