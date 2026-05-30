@@ -6,7 +6,7 @@ set(BINARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIRECTORY})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIRECTORY})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIRECTORY})
-project(${PROJECT_NAME} CXX)
+project(${PROJECT_NAME} CXX C)
 # Set CMake Build Type
 set(CMAKE_BUILD_TYPE Debug)
 option(BUILD_SHARED_LIBS "Build as a Shared Library" ON)
@@ -14,7 +14,7 @@ option(KSTL_FREESTANDING "Build as a Freestanding Static Library" OFF)
 option(KSTL_TESTS "Build Tests" ON)
 option(KSTL_FREESTANDING_X86 "Build as 32-bit x86" OFF)
 
-option(KSTL_FLOATING_POINT_SUPPORTED "Support floating-point ")
+option(KSTL_FLOATING_POINT_SUPPORTED "Support floating-point operations" ON)
 
 set(KSTL_COMPILER_FLAGS -Wall -Wextra -Wpedantic -Werror=return-type -Werror=uninitialized -Werror=nonnull -Werror=null-dereference -Werror=strict-aliasing -Werror=undef -Werror=sign-compare -fno-omit-frame-pointer)
 
@@ -47,12 +47,18 @@ if (KSTL_FREESTANDING)
     add_link_options(
         -no-pie
     )
+
+    add_library(kstl_crt
+        src/runtime/runtime.c
+    )
+
+    target_include_directories(kstl_crt PRIVATE include)
 endif()
 
 add_library(${PROJECT_NAME}
-    src/runtime.cpp
-    src/string.cpp
-    src/stdlib.cpp
+    src/stl/runtime.cpp
+    src/stl/string.cpp
+    src/stl/stdlib.cpp
 )
 
 if (KSTL_FREESTANDING)
