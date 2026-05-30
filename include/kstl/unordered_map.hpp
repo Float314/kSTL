@@ -83,7 +83,7 @@ namespace kstd {
             unordered_map *container = nullptr;
             size_t bucket_idx = 0;
             node_t *current = nullptr;
-
+        public:
             pair<const Key, T>& operator*() const noexcept {
                 return current->value;
             }
