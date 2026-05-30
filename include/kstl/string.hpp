@@ -13,6 +13,8 @@ namespace kstd {
         char *_data = nullptr;
         size_t _size = 0;
         size_t _capacity = 0;
+    private:
+        void null_check() noexcept;
     public:
         size_t size() const noexcept;
         size_t capacity() const noexcept;
@@ -37,6 +39,7 @@ namespace kstd {
         void pop_back() noexcept;
 
         void reserve(size_t bytes) noexcept;
+        void resize(size_t bytes) noexcept;
         void shrink_to_fit() noexcept;
     public:
         char* data() const noexcept;
@@ -62,6 +65,7 @@ namespace kstd {
         string& operator=(const string &s) noexcept;
         string& operator+=(const char*) noexcept;
         string& operator+=(const string &s) noexcept;
+        string& operator+=(char c) noexcept;
 
         string& operator=(string &&other) noexcept;
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "kstl/types.hpp"
+#include "kstl/utility.hpp"
 
 namespace kstd {
     template<typename T>
@@ -110,5 +111,20 @@ namespace kstd {
         }
 
         return dest_begin;
+    }
+
+    template<typename It>
+    void iter_swap(It a, It b) {
+        using kstd::swap;
+        swap(*a, *b);
+    }
+
+    template<typename BidirectionalIt>
+    void reverse(BidirectionalIt begin, BidirectionalIt end) {
+        while (begin < end) {
+            --end;
+            iter_swap(begin, end);
+            ++begin;
+        }
     }
 }

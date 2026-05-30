@@ -95,19 +95,21 @@ namespace kstd {
     // Not-standard
     // Credits: https://youtube.com/watch?v=SmlLdd1Q2V8
     template<typename Destination>
-    constexpr Destination implicit_cast(type_identity_t<Destination> src) {
+    constexpr Destination implicit_cast(type_identity_t<Destination> src) noexcept {
         return src;
     }
 
     // Not-standard, alias to bit_cast
     // Credits: https://youtube.com/watch?v=SmlLdd1Q2V8
     template<typename Destination, typename Source>
-    constexpr Destination pun_cast(const Source &val) {
+    constexpr Destination pun_cast(const Source &val) noexcept {
+        static_assert(sizeof(Destination) == sizeof(Source));
         return __builtin_bit_cast(Destination, val);
     }
 
     template<typename Destination, typename Source>
-    constexpr Destination bit_cast(const Source &val) {
+    constexpr Destination bit_cast(const Source &val) noexcept {
+        static_assert(sizeof(Destination) == sizeof(Source));
         return __builtin_bit_cast(Destination, val);
     }
 
@@ -155,12 +157,12 @@ namespace kstd {
     };
 
     template<typename T, typename U>
-    pair<T, U> make_pair(const T &first, const T &second) {
+    pair<T, U> make_pair(const T &first, const T &second) noexcept {
         return pair<T, U> { first, second };
     }
 
     template<typename T, typename U>
-    pair<T, U> make_pair(T &&first, T &&second) {
+    pair<T, U> make_pair(T &&first, T &&second) noexcept {
         return pair<T, U> { first, second };
     }
 }

@@ -32,15 +32,16 @@ this->_size = strlen(data);
         return this->_capacity;
     }
 
-    void string::append(char c) noexcept {
+    void string::null_check() noexcept {
         if (this->_data == nullptr) {
-            this->_capacity = 2;
-            this->_size = 1;
-            this->_data = (char*) kstl_globals::malloc(2);
-            this->_data[0] = c;
-            this->_data[1] = '\0';
-            return;
+            this->_capacity = 1;
+            this->_size = 0;
+            this->_data = reinterpret_cast<char*>(kstl_globals::malloc(this->_capacity));
         }
+    } 
+
+    void string::append(char c) noexcept {
+        this->null_check();
 
         if (this->_size + 2 > this->_capacity) {
             size_t old_capacity = this->_capacity;
@@ -59,14 +60,7 @@ this->_size = strlen(data);
         size_t len = strlen(str);
         for (size_t i = 0; i < len; ++i) {
             char c = str[i];
-            if (this->_data == nullptr) {
-                this->_capacity = 2;
-                this->_size = 1;
-                this->_data = (char*) kstl_globals::malloc(2);
-                this->_data[0] = c;
-                this->_data[1] = '\0';
-                return;
-            }
+            this->null_check();
 
             if (this->_size + 2 > this->_capacity) {
                 size_t old_capacity = this->_capacity;
@@ -102,20 +96,55 @@ this->_size = strlen(data);
         this->_size--;
     }
 
-    void string::reserve(size_t bytes) noexcept {
-        if (bytes <= this->_capacity) {
+    void string::reserve(size_t elements) noexcept {
+        this->null_check();
+
+        if (elements == this->_size) return;
+        if (elements < this->_size) {
+            this->_capacity = elements;
+
             return;
         }
 
         size_t old_capacity = this->_capacity;
-        this->_capacity = kstd::max(bytes, this->_capacity * 2);
-        char *new_data = (char*) kstl_globals::malloc(this->_capacity);
+        this->_capacity = elements;
+
+        char *new_data = reinterpret_cast<char*>(kstl_globals::malloc(this->_capacity));
+
         kstd::memcpy(new_data, this->_data, old_capacity);
+        kstd::memset(new_data + this->_size, 0, elements - old_capacity);
         kstl_globals::free(this->_data);
+
+        this->_data = new_data;
+    }
+
+    void string::resize(size_t elements) noexcept {
+        this->null_check();
+
+        if (elements == this->_size) return;
+        if (elements < this->_size) {
+            this->_data[elements] = '\0';
+            this->_size = elements;
+
+            return;
+        }
+
+        size_t old_size = this->_size;
+        this->_capacity = elements + 1;
+        this->_size = elements;
+
+        char *new_data = reinterpret_cast<char*>(kstl_globals::malloc(this->_capacity));
+
+        kstd::memcpy(new_data, this->_data, old_size);
+        kstd::memset(new_data + this->_size, 0, elements - old_size);
+        kstl_globals::free(this->_data);
+
         this->_data = new_data;
     }
 
     void string::shrink_to_fit() noexcept {
+        this->null_check();
+
         if (this->_capacity > this->_size + 1) {
             this->_capacity = this->_size + 1;
             char *new_data = (char*) kstl_globals::malloc(this->_capacity);
@@ -158,6 +187,7 @@ this->_size = strlen(data);
     }
 
     char& string::front() noexcept {
+        this->null_check();
         if (0 >= this->_size) {
             kstl_globals::g_init_data.panic();
         }
@@ -174,6 +204,7 @@ this->_size = strlen(data);
     }
 
     char& string::back() noexcept {
+        this->null_check();
         if (this->_size - 1 < 0) {
             kstl_globals::g_init_data.panic();
         }
@@ -347,6 +378,11 @@ this->_size = strlen(data);
         return *this;
     }
 
+    string& string::operator+=(char c) noexcept {
+        this->append(c);
+        return *this;
+    }
+
     string string::operator+(const string &s) const noexcept {
         string res;
         res.reserve(this->_size + s._size);
@@ -489,5 +525,19 @@ this->_size = strlen(data);
 
     void memset(void *s, int c, size_t n) {
         __builtin_memset(s, c, n);
+    }
+
+    kstd::string to_string(int v) {
+        kstd::string result;
+
+        while (v > 9) {
+            result += static_cast<char>((v % 10) + '0');
+            v /= 10;
+        }
+
+        result += static_cast<char>(v + '0');
+        kstd::reverse(result.begin(), result.end());
+
+        return result;
     }
 }

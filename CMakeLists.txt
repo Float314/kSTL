@@ -94,6 +94,9 @@ if (KSTL_TESTS)
 
         optional/basic
         optional/nullopt
+
+        # Integration
+        integration/vector_of_strings
     )
 
     add_library(log_vector STATIC
