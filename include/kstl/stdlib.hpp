@@ -3,5 +3,6 @@
 #include "kstl/types.hpp"
 
 namespace kstd {
-    void memcpy(void *__restrict dst, const void *__restrict src, size_t bytes);
+    /// @brief Deprecated; Use kstd::memcpy from <kstl/string.hpp> instead
+    [[deprecated]] void memcpy(void *__restrict dst, const void *__restrict src, size_t bytes);
 }

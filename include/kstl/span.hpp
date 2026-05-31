@@ -23,35 +23,27 @@ namespace kstd {
         T *_data = nullptr;
         size_t _size = 0;
     public:
-        size_t size() const noexcept {
+        constexpr size_t size() const noexcept {
             return this->_size;
         }
 
-        T& at(size_t index) noexcept {
-            if (index >= this->_size) {
-                kstl_globals::g_init_data.panic();
-            }
-
-            return this->_data[index];
+        constexpr size_t size_bytes() const noexcept {
+            return this->_size * sizeof(T);
         }
 
-        const T& at(size_t index) const noexcept {
-            if (index >= this->_size) {
-                kstl_globals::g_init_data.panic();
-            }
-
-            return this->_data[index];
+        constexpr bool empty() const noexcept {
+            return this->_size == 0;
         }
     public:
-        T& operator[](size_t index) noexcept {
+        constexpr T& operator[](size_t index) noexcept {
             return this->_data[index];
         }
 
-        const T& operator[](size_t index) const noexcept {
+        constexpr const T& operator[](size_t index) const noexcept {
             return this->_data[index];
         }
 
-        span& operator=(const span& other) noexcept {
+        constexpr span& operator=(const span& other) noexcept {
             if (this == &other) {
                 return *this;
             }
@@ -62,21 +54,9 @@ namespace kstd {
             return *this;
         }
 
-        span& operator=(span &&v) noexcept {
-            if (this == &v) return *this;
-
-            this->_size = v._size;
-            this->_data = v._data;
-
-            v._data = nullptr;
-            v._size = 0;
-
-            return *this;
-        }
-
-        bool operator==(const span &other) const noexcept {
+        constexpr bool operator==(const span &other) const noexcept {
             if (&other == this) return true;
-            if (other._size != this) return false;
+            if (other._size != this->_size) return false;
 
             for (size_t i = 0; i < this->_size; ++i) {
                 if (this->_data[i] != other._data[i]) {
@@ -87,50 +67,46 @@ namespace kstd {
             return true;
         }
 
-        bool operator!=(const span &other) const noexcept {
-            return !(this == *other);
+        constexpr bool operator!=(const span &other) const noexcept {
+            return !(*this == other);
         }
     public:
-        T* data() const noexcept {
-            return this->_data;
-        }
-
-        T& front() noexcept {
+        constexpr T& front() noexcept {
             return this->_data[0];
         }
 
-        const T& front() const noexcept {
+        constexpr const T& front() const noexcept {
             return this->_data[0];
         }
 
-        T& back() noexcept {
+        constexpr T& back() noexcept {
             return this->_data[this->_size - 1];
         }
 
-        const T& back() const noexcept {
+        constexpr const T& back() const noexcept {
             return this->_data[this->_size - 1];
         }
     public:
-        iterator begin() noexcept {
+        constexpr iterator begin() noexcept {
             return this->_data;
         }
 
-        iterator end() noexcept {
+        constexpr iterator end() noexcept {
             return this->_data + this->_size;
         }
 
-        const_iterator begin() const noexcept {
+        constexpr const_iterator begin() const noexcept {
             return this->_data;
         }
 
-        const_iterator end() const noexcept {
+        constexpr const_iterator end() const noexcept {
             return this->_data + this->_size;
         }
     public:
-        span() = default;
-        span(T *memory, size_t size) : _data(memory), _size(size) {}
-        span(const span &other) = default;
+        constexpr span() = default;
+        constexpr span(T *memory, size_t size) : _data(memory), _size(size) {}
+        constexpr span(const span &other) = default;
     public:
-        ~span() = default;
+        // Implicit destructor
     };
 }
