@@ -11,8 +11,8 @@ typedef struct std_args {
 
 void get_args(struct std_args *out);
 
+int KCRT_MAIN_FUNCTION (void);
+
 #ifdef __cplusplus
 }
 #endif
-
-int main(void);

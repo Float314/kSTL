@@ -52,6 +52,10 @@ if (KSTL_FREESTANDING)
         src/runtime/runtime.c
     )
 
+    target_compile_definitions(kstl_crt PRIVATE
+        KCRT_MAIN_FUNCTION=main
+    )
+
     target_include_directories(kstl_crt PRIVATE include)
 endif()
 

@@ -1,5 +1,6 @@
 # kSTL
 A freestanding and minimal implementation of the C++ Standard Template Library (STL)
+This repository also includes a minimal C++ Runtime for initialization of constructors and a main function
 
 Before we get started, an important note: **This STL implementation does not aim to be 100% standards-compliant, instead it aims to be a simple easy-to-use freestanding version of the STL.**
 
