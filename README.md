@@ -2,7 +2,7 @@
 A freestanding and minimal implementation of the C++ Standard Template Library (STL)
 This repository also includes a minimal C++ Runtime for initialization of constructors and a main function
 
-[![Hosted](https://github.com/xNoerPlaysCodes/kSTL/actions/workflows/freestanding.yml/badge.svg)](https://github.com/xNoerPlaysCodes/kSTL/actions/workflows/freestanding.yml)
+[![Hosted](https://github.com/xNoerPlaysCodes/kSTL/actions/workflows/hosted.yml/badge.svg)](https://github.com/xNoerPlaysCodes/kSTL/actions/workflows/hosted.yml)
 [![Freestanding](https://github.com/xNoerPlaysCodes/kSTL/actions/workflows/freestanding.yml/badge.svg)](https://github.com/xNoerPlaysCodes/kSTL/actions/workflows/freestanding.yml)
 
 Before we get started, an important note: **This STL implementation does not aim to be 100% standards-compliant, instead it aims to be a simple easy-to-use freestanding version of the STL.**
