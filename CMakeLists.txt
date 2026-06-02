@@ -56,6 +56,10 @@ if (KSTL_FREESTANDING)
         KCRT_MAIN_FUNCTION=main
     )
 
+    target_compile_options(kstl_crt PRIVATE
+        ${KSTL_COMPILER_FLAGS}
+    )
+
     target_include_directories(kstl_crt PRIVATE include)
 endif()
 
@@ -96,6 +100,7 @@ if (KSTL_TESTS)
         vector/resize_and_reserve
         vector/move_only_type
         vector/reserveless_stress_allocations
+        vector/construct_and_destruct
 
         unordered_map/basic
         unordered_map/iterators
@@ -107,6 +112,7 @@ if (KSTL_TESTS)
 
         # Integration
         integration/vector_of_strings
+        integration/unordered_map_of_vector_of_ints_and_string
     )
 
     add_library(log_vector STATIC

@@ -398,6 +398,24 @@ namespace kstd {
             return th.first->second;
         }
 
+        T& at(const Key &key) noexcept {
+            auto it = find(key);
+            if (it == end()) {
+                kstl_globals::g_init_data.panic();
+            }
+
+            return it->second;
+        }
+
+        const T& at(const Key &key) const noexcept {
+            auto it = find(key);
+            if (it == end()) {
+                kstl_globals::g_init_data.panic();
+            }
+
+            return it->second;
+        }
+
         // TODO: Implement
         // How are we gonna move it but use it twice?
         // T& operator[](Key &&key) noexcept = delete;

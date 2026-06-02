@@ -240,7 +240,7 @@ namespace kstd {
 
         bool operator==(const vector &other) const noexcept {
             if (&other == this) return true;
-            if (other._size != this) return false;
+            if (other._size != this->_size) return false;
 
             for (size_t i = 0; i < this->_size; ++i) {
                 if (this->_data[i] != other._data[i]) {
@@ -252,7 +252,7 @@ namespace kstd {
         }
 
         bool operator!=(const vector &other) const noexcept {
-            return !(this == *other);
+            return !(*this == other);
         }
     public:
         T* data() const noexcept {
