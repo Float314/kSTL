@@ -1,7 +1,6 @@
 #include "kstl/string.hpp"
 #include "kstl/algorithm.hpp"
 #include "kstl/runtime.hpp"
-#include "kstl/stdlib.hpp"
 
 namespace kstl_globals {
     extern kstd::rt_init g_init_data;
@@ -17,11 +16,15 @@ namespace kstd {
     string::string() {}
 
     string::string(const char *data) {
-this->_size = strlen(data);
+        this->_size = strlen(data);
         this->_capacity = this->_size + 1;
         this->_data = (char*) kstl_globals::malloc(this->_capacity);
         strncpy(this->_data, data, this->_capacity);
         this->_data[this->_capacity - 1] = '\0';
+    }
+
+    string::string(size_t n, char c) {
+        this->append(n, c);
     }
 
     size_t string::size() const noexcept {
@@ -39,6 +42,14 @@ this->_size = strlen(data);
             this->_data = reinterpret_cast<char*>(kstl_globals::malloc(this->_capacity));
         }
     } 
+
+    void string::append(size_t n, char c) noexcept {
+        if (n == 0) return;
+        if (this->_capacity < this->_size + n) {
+            this->reserve(this->_size + n);
+        }
+        while (n-- != 0) this->append(c);
+    }
 
     void string::append(char c) noexcept {
         this->null_check();
@@ -321,6 +332,14 @@ this->_size = strlen(data);
 
     string::const_iterator string::end() const noexcept {
         return this->_data + this->_size;
+    }
+
+    string::const_iterator string::cbegin() const noexcept {
+        return const_iterator(this->_data);
+    }
+
+    string::const_iterator string::cend() const noexcept {
+        return const_iterator(this->_data + this->_size);
     }
 
     string& string::operator=(const char* s) noexcept {

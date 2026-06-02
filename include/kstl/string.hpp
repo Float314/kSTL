@@ -31,6 +31,7 @@ namespace kstd {
         char& back() noexcept;
         const char& back() const noexcept;
     public:
+        void append(size_t count, char c) noexcept;
         void append(char c) noexcept;
         void append(char *str) noexcept;
         void append(const string &str) noexcept;
@@ -60,6 +61,9 @@ namespace kstd {
 
         const_iterator begin() const noexcept;
         const_iterator end() const noexcept;
+
+        const_iterator cbegin() const noexcept;
+        const_iterator cend() const noexcept;
     public:
         string& operator=(const char*) noexcept;
         string& operator=(const string &s) noexcept;
@@ -82,6 +86,7 @@ namespace kstd {
     public:
         string();
         string(const char *data);
+        string(size_t n, char c);
 
         string(const string &s);
         string(string &&other);

@@ -36,6 +36,7 @@ namespace kstl::test {
                     return reinterpret_cast<void*>((char*) mem + sizeof(header));
                 },
                 .free = [](void *mem) -> void {
+                    k_expect(mem != nullptr);
                     header *h = (header*) ((char*) mem - sizeof(header));
                     g_memory_allocated -= h->sz;
                     g_memory_allocations -= 1;

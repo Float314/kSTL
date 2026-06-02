@@ -3,6 +3,7 @@
 #include <concepts>
 #include <initializer_list>
 #include <new>
+#include <type_traits>
 #include "kstl/types.hpp"
 #include "kstl/stdlib.hpp"
 #include "kstl/utility.hpp"
@@ -13,6 +14,67 @@ namespace kstl_globals {
     extern kstd::rt_init g_init_data;
     extern void* (*malloc)(size_t);
     extern void (*free)(void*);
+}
+
+namespace kstd::detail {
+    template<typename T>
+    void move_array(T *dst, T *src, size_t len) {
+        if constexpr (std::is_trivially_copyable_v<T>) {
+            kstd::memcpy(dst, src, len * sizeof(T));
+        } else {
+            for (size_t i = 0; i < len; ++i) {
+                new (&dst[i]) T(kstd::move(src[i]));
+                src[i].~T();
+            }
+        }
+    }
+
+    template<typename T>
+    void copy_array(T *dst, const T *src, size_t len) {
+        if constexpr (std::is_trivially_copyable_v<T>) {
+            kstd::memcpy(dst, src, len * sizeof(T));
+        } else {
+            for (size_t i = 0; i < len; ++i) {
+                new (&dst[i]) T(src[i]);
+            }
+        }
+    }
+
+    template<typename T>
+    void move(T *dst_ptr, T &&src) {
+        if constexpr (std::is_trivially_copyable_v<T>) {
+            kstd::memcpy(dst_ptr, &src, sizeof(T));
+        } else {
+            *dst_ptr = kstd::move(src);
+        }
+    }
+
+    template<typename T>
+    void move_construct(T *dst_unconstructed_ptr, T &&src) {
+        if constexpr (std::is_trivially_copyable_v<T>) {
+            kstd::memcpy(dst_unconstructed_ptr, &src, sizeof(T));
+        } else {
+            new (dst_unconstructed_ptr) T(kstd::move(src));
+        }
+    }
+
+    template<typename T>
+    void copy(T *dst_ptr, const T &src) {
+        if constexpr (std::is_trivially_copyable_v<T>) {
+            kstd::memcpy(dst_ptr, &src, sizeof(T));
+        } else {
+            *dst_ptr = src;
+        }
+    }
+
+    template<typename T>
+    void copy_construct(T *dst_unconstructed_ptr, const T &src) {
+        if constexpr (std::is_trivially_copyable_v<T>) {
+            kstd::memcpy(dst_unconstructed_ptr, &src, sizeof(T));
+        } else {
+            new (dst_unconstructed_ptr) T(src);
+        }
+    }
 }
 
 namespace kstd {
@@ -33,10 +95,7 @@ namespace kstd {
                 kstl_globals::malloc(sizeof(T) * this->_capacity)
             );
 
-            for (size_t i = 0; i < this->_size; ++i) {
-                new (&new_data[i]) T(kstd::move(this->_data[i]));
-                this->_data[i].~T();
-            }
+            detail::move_array(new_data, this->_data, this->_size);
 
             kstl_globals::free(this->_data);
             this->_data = new_data;
@@ -77,7 +136,7 @@ namespace kstd {
                 grow();
             }
 
-            new (this->_data + this->_size++) T(kstd::move(elm));
+            detail::copy_construct(this->_data + this->_size++, elm);
         }
 
         void push_back(T &&elm) noexcept {
@@ -91,7 +150,7 @@ namespace kstd {
                 grow();
             }
 
-            new (this->_data + this->_size++) T(kstd::move(elm));
+            detail::move_construct(this->_data + this->_size++, kstd::move(elm));
         }
 
         template<typename... Args>
@@ -134,9 +193,7 @@ namespace kstd {
             size_t old_capacity = this->_capacity;
             this->_capacity = kstd::max(elements, _capacity * 2);
             T *new_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
-            for (size_t i = 0; i < old_capacity; ++i) {
-                new (&new_data[i]) T(kstd::move(this->_data[i]));
-            }
+            detail::move_array(new_data, this->_data, old_capacity);
             kstl_globals::free(this->_data);
             this->_data = new_data;
         }
@@ -148,21 +205,14 @@ namespace kstd {
                 this->_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
             }
 
-            T* new_data =
-                reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * elements));
+            T* new_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * elements));
 
             size_t copy_count = (elements < _size) ? elements : _size;
 
-            for (size_t i = 0; i < copy_count; ++i) {
-                new (&new_data[i]) T(kstd::move(_data[i]));
-            }
+            detail::move_array(new_data, this->_data, copy_count);
 
             for (size_t i = copy_count; i < elements; ++i) {
                 new (&new_data[i]) T();
-            }
-
-            for (size_t i = 0; i < _size; ++i) {
-                _data[i].~T();
             }
 
             kstl_globals::free(_data);
@@ -177,9 +227,7 @@ namespace kstd {
                 size_t old_capacity = this->_capacity;
                 this->_capacity = this->_size;
                 T *new_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
-                for (size_t i = 0; i < old_capacity; ++i) {
-                    new (&new_data[i]) T(kstd::move(this->_data[i]));
-                }
+                detail::move_array(new_data, this->_data, old_capacity);
                 kstl_globals::free(this->_data);
                 this->_data = new_data;
             }
@@ -211,9 +259,7 @@ namespace kstd {
                 kstl_globals::malloc(sizeof(T) * this->_capacity)
             );
 
-            for (size_t i = 0; i < this->_size; ++i) {
-                new (&this->_data[i]) T(other._data[i]);
-            }
+            detail::copy_array(this->_data, other._data, this->_size);
 
             return *this;
         }
@@ -289,6 +335,14 @@ namespace kstd {
 
         const_iterator end() const noexcept {
             return this->_data + this->_size;
+        }
+
+        const_iterator cbegin() const noexcept {
+            return const_iterator(this->_data);
+        }
+
+        const_iterator cend() const noexcept {
+            return const_iterator(this->_data + this->_size);
         }
     public:
         vector() = default;

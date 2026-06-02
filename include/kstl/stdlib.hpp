@@ -4,5 +4,5 @@
 
 namespace kstd {
     /// @brief Deprecated; Use kstd::memcpy from <kstl/string.hpp> instead
-    [[deprecated]] void memcpy(void *__restrict dst, const void *__restrict src, size_t bytes);
+    void memcpy(void *__restrict dst, const void *__restrict src, size_t bytes);
 }

@@ -292,6 +292,14 @@ namespace kstd {
         const_iterator end() const noexcept {
             return { this, this->bucket_count, nullptr };
         }
+
+        const_iterator cbegin() const noexcept {
+            return { this, 0, this->nodes[0] };
+        }
+
+        const_iterator cend() const noexcept {
+            return { this, this->bucket_count, nullptr };
+        }
     public:
         void erase(iterator it) noexcept {
             if (this->nodes != nullptr && it != end()) {
