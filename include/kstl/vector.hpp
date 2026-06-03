@@ -5,7 +5,7 @@
 #include <new>
 #include <type_traits>
 #include "kstl/types.hpp"
-#include "kstl/stdlib.hpp"
+#include "kstl/string.hpp"
 #include "kstl/utility.hpp"
 #include "kstl/runtime.hpp"
 #include "kstl/algorithm.hpp"
@@ -283,23 +283,6 @@ namespace kstd {
 
             return *this;
         }
-
-        bool operator==(const vector &other) const noexcept {
-            if (&other == this) return true;
-            if (other._size != this->_size) return false;
-
-            for (size_t i = 0; i < this->_size; ++i) {
-                if (this->_data[i] != other._data[i]) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        bool operator!=(const vector &other) const noexcept {
-            return !(*this == other);
-        }
     public:
         T* data() const noexcept {
             return this->_data;
@@ -395,4 +378,23 @@ namespace kstd {
             }
         }
     };
+
+    template<typename T>
+    bool operator==(const vector<T> &lhs, const vector<T> &rhs) noexcept {
+        if (&lhs == &rhs) return true;
+        if (lhs.size() != rhs.size()) return false;
+
+        for (size_t i = 0; i < lhs.size(); ++i) {
+            if (lhs[i] != rhs[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    template<typename T>
+    bool operator!=(const vector<T> &lhs, const vector<T> &rhs) noexcept {
+        return !operator==(lhs, rhs);
+    }
 }

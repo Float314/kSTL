@@ -1,5 +1,6 @@
 #pragma once
 
+#include "kstl/cstddef.hpp"
 #include <cstddef>
 #include <kstl/runtime.hpp>
 #include <kstl/stdlib.hpp>
@@ -11,17 +12,26 @@ namespace kstl_globals {
     extern void (*free)(void*);
 }
 
-namespace kstd {
+namespace kstd::detail {
     template<typename T>
-    struct __calldestructor_default_delete {
-        void operator()(T *ptr) const {
+    struct manual_destructor_call_default_delete {
+        void operator()(T *ptr) const noexcept {
             ptr->~T();
             kstl_globals::free(ptr);
         }
     };
 
     template<typename T>
-    using default_delete = __calldestructor_default_delete<T>;
+    struct operator_delete_default_delete {
+        void operator()(T *ptr) const noexcept {
+            delete ptr;
+        }
+    };
+}
+
+namespace kstd {
+    template<typename T>
+    using default_delete = detail::manual_destructor_call_default_delete<T>;
 
     template<typename T, typename Deleter = default_delete<T>>
     class unique_ptr {
@@ -78,18 +88,6 @@ namespace kstd {
             
             return *this;
         }
-
-        bool operator==(const unique_ptr &other) const noexcept {
-            return other.ptr == this->ptr;
-        }
-
-        bool operator==(std::nullptr_t) const noexcept {
-            return this->ptr == nullptr;
-        }
-
-        bool operator!=(std::nullptr_t) const noexcept {
-            return this->ptr != nullptr;
-        }
     public:
         unique_ptr(T *ptr) : ptr(ptr) {}
         unique_ptr() : ptr(nullptr) {}
@@ -109,15 +107,35 @@ namespace kstd {
         }
     };
 
-    // template<typename T, typename... Args>
-    // unique_ptr<T> make_unique(Args&&... args) {
-    //     T *ptr = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T)));
-    //     if (ptr == nullptr) {
-    //         kstl_globals::g_init_data.panic();
-    //     }
-    //     new (ptr) T(kstd::forward<Args>(args)...);
-    //     return unique_ptr<T>(ptr);
-    // }
+    template<typename T, typename Deleter>
+    bool operator==(const unique_ptr<T, Deleter> &lhs, const unique_ptr<T, Deleter> &rhs) noexcept {
+        return lhs.get() == rhs.get();
+    }
+
+    template<typename T, typename Deleter>
+    bool operator==(const unique_ptr<T, Deleter> &lhs, kstd::nullptr_t) noexcept {
+        return lhs.get() == nullptr;
+    }
+
+    template<typename T, typename Deleter>
+    bool operator==(kstd::nullptr_t, const unique_ptr<T, Deleter> &rhs) noexcept {
+        return rhs.get() == nullptr;
+    }
+
+    template<typename T, typename Deleter>
+    bool operator!=(const unique_ptr<T, Deleter> &lhs, const unique_ptr<T, Deleter> &rhs) noexcept {
+        return lhs.get() != rhs.get();
+    }
+
+    template<typename T, typename Deleter>
+    bool operator!=(const unique_ptr<T, Deleter> &lhs, kstd::nullptr_t) noexcept {
+        return lhs.get() != nullptr;
+    }
+
+    template<typename T, typename Deleter>
+    bool operator!=(kstd::nullptr_t, const unique_ptr<T, Deleter> &rhs) noexcept {
+        return rhs.get() != nullptr;
+    }
 
     template<typename T, typename... Args>
     unique_ptr<T> make_unique(Args&&... args) {

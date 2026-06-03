@@ -185,4 +185,36 @@ namespace kstd {
             }
         }
     };
+
+    template<typename T>
+    bool operator==(const optional<T> &lhs, const optional<T> &rhs) noexcept {
+        // Credits: https://en.cppreference.com/cpp/utility/optional/operator_cmp
+        return lhs.has_value() != rhs.has_value() ? false :
+               (lhs.has_value() == false ? true : *lhs == *rhs);
+    }
+
+    template<typename T>
+    bool operator!=(const optional<T> &lhs, const optional<T> &rhs) noexcept {
+        return !operator==(lhs, rhs);
+    }
+
+    template<typename T>
+    bool operator==(const optional<T> &lhs, kstd::nullopt_t) noexcept {
+        return !lhs.has_value();
+    }
+
+    template<typename T>
+    bool operator!=(const optional<T> &lhs, kstd::nullopt_t) noexcept {
+        return lhs.has_value();
+    }
+
+    template<typename T>
+    bool operator==(kstd::nullopt_t, const optional<T> &rhs) noexcept {
+        return !rhs.has_value();
+    }
+
+    template<typename T>
+    bool operator!=(kstd::nullopt_t, const optional<T> &rhs) noexcept {
+        return rhs.has_value();
+    }
 }

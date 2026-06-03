@@ -9,6 +9,7 @@ int main() {
     {
         kstl::test::log("construct", std::format("kstd::vector<int> v = {}", "{1, 2, 3, 4, 5, 6, 7, 8, 9}"));
         kstd::vector<int> v = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+        v = v; 
         k_expect(v.size() == 9);
         kstl::test::log_vector_i(v, "v");
         int pb_value = 42;

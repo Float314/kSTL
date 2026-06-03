@@ -77,12 +77,6 @@ namespace kstd {
 
         char& operator[](size_t index) noexcept;
         const char& operator[](size_t index) const noexcept;
-
-        bool operator==(const string &other) const noexcept;
-        bool operator==(const char *s) const noexcept;
-
-        bool operator!=(const string &other) const noexcept;
-        bool operator!=(const char *s) const noexcept;
     public:
         string();
         string(const char *data);
@@ -93,6 +87,14 @@ namespace kstd {
     public:
         ~string();
     };
+
+    bool operator==(const string &lhs, const string &rhs) noexcept;
+    bool operator==(const string &lhs, const char *rhs) noexcept;
+    bool operator==(const char *lhs, const string &rhs) noexcept;
+
+    bool operator!=(const string &lhs, const string &rhs) noexcept;
+    bool operator!=(const string &lhs, const char *rhs) noexcept;
+    bool operator!=(const char *lhs, const string &rhs) noexcept;
 
     size_t strlen(const char *s);
     char* strcpy(char *__restrict dst, char *__restrict src);

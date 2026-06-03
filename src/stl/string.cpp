@@ -418,23 +418,6 @@ namespace kstd {
         return this->_data[index];
     }
 
-    bool string::operator==(const string &other) const noexcept {
-        if (this == &other) return true;
-        return streq_2n(this->_data, other._data, this->_size, other._size);
-    }
-
-    bool string::operator==(const char *s) const noexcept {
-        return streq_2n(this->_data, s, this->_size, strlen(s));
-    }
-
-    bool string::operator!=(const string &other) const noexcept {
-        return !(*this == other);
-    }
-
-    bool string::operator!=(const char *s) const noexcept {
-        return !(*this == s);
-    }
-
     string::string(const string &s) {
         this->_size = s._size;
         this->_capacity = s._capacity;
@@ -456,14 +439,6 @@ namespace kstd {
         if (this->_data != nullptr) {
             kstl_globals::free(this->_data);
         }
-    }
-
-    bool operator==(const char *lhs, const string &rhs) {
-        return rhs == lhs;
-    }
-
-    bool operator!=(const char *lhs, const string &rhs) {
-        return rhs != lhs;
     }
 
     size_t strlen(const char *s) {
@@ -558,5 +533,29 @@ namespace kstd {
         kstd::reverse(result.begin(), result.end());
 
         return result;
+    }
+
+    bool operator==(const string &lhs, const string &rhs) noexcept {
+        return streq_2n(lhs.c_str(), rhs.c_str(), lhs.size(), rhs.size());
+    }
+
+    bool operator==(const string &lhs, const char *rhs) noexcept {
+        return streq_2n(lhs.c_str(), rhs, lhs.size(), strlen(rhs));
+    }
+
+    bool operator==(const char *lhs, const string &rhs) noexcept {
+        return streq_2n(rhs.c_str(), lhs, rhs.size(), strlen(lhs));
+    }
+
+    bool operator!=(const string &lhs, const string &rhs) noexcept {
+        return !operator==(lhs, rhs);
+    }
+
+    bool operator!=(const string &lhs, const char *rhs) noexcept {
+        return !operator==(lhs, rhs);
+    }
+
+    bool operator!=(const char *lhs, const string &rhs) noexcept {
+        return !operator==(lhs, rhs);
     }
 }
