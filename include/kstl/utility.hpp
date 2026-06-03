@@ -156,6 +156,53 @@ namespace kstd {
         ~pair() = default;
     };
 
+    template<typename... Ts>
+    struct tuple;
+
+    template<>
+    struct tuple<> {};
+
+    template<typename T, typename... Ts>
+    struct tuple<T, Ts...> {
+    private:
+        T val;
+        tuple<Ts...> rest;
+    public:
+        tuple& operator=(const tuple &other) = default;
+        tuple& operator=(tuple &&other) = default;
+    public:
+        tuple() = default;
+        tuple(const tuple &other) = default;
+        tuple(tuple &&other) = default;
+    };
+
+    template<size_t Index, typename T, typename U>
+    constexpr T get(const pair<T, U> &p) noexcept {
+        if constexpr (Index == 0) {
+            return p.first;
+        } else if constexpr (Index == 1) {
+            return p.second;
+        }
+    }
+
+    template<typename T, typename U>
+    constexpr const T& get(const pair<T, U> &p) noexcept {
+        if constexpr (std::is_same_v<decltype(p.first), T>) {
+            return p.first;
+        } else {
+            return p.second;
+        }
+    }
+
+    template<typename U, typename T>
+    constexpr const U& get(const pair<T, U> &p) noexcept {
+        if constexpr (std::is_same_v<decltype(p.first), U>) {
+            return p.first;
+        } else {
+            return p.second;
+        }
+    }
+
     template<typename T, typename U>
     pair<T, U> make_pair(const T &first, const T &second) noexcept {
         return pair<T, U> { first, second };

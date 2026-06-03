@@ -1,6 +1,5 @@
 #include <kstl/runtime.hpp>
 #include <cstddef>
-#include <new>
 
 namespace kstl_globals {
     kstd::rt_init g_init_data;
