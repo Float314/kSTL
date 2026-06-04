@@ -2,7 +2,6 @@
 
 #include <concepts>
 #include <initializer_list>
-#include <new>
 #include <type_traits>
 #include "kstl/types.hpp"
 #include "kstl/string.hpp"
@@ -151,6 +150,31 @@ namespace kstd {
             }
 
             detail::move_construct(this->_data + this->_size++, kstd::move(elm));
+        }
+
+        // Non-standard
+        void append(const vector &other) noexcept {
+            if (&other == this) return;
+            if (other._data == nullptr) return;
+            this->reserve(this->size() + other.size());
+            for (auto &elm : other) {
+                this->push_back(elm);
+            }
+        }
+
+        // Non-standard
+        void append(vector &&other) noexcept {
+            if (&other == this) return;
+            if (other._data == nullptr) return;
+            this->reserve(this->size() + other.size());
+            detail::move_array(this->_data + this->_size, other._data, other._size);
+            this->_size += other._size;
+
+            kstl_globals::free(other._data);
+
+            other._data = nullptr;
+            other._size = 0;
+            other._capacity = 0;
         }
 
         template<typename... Args>

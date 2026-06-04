@@ -55,6 +55,9 @@ namespace kstd {
         bool ends_with(char suffix) const noexcept;
         bool ends_with(const char *suffix) const noexcept;
         bool ends_with(const string &suffix) const noexcept;
+
+        bool contains(char c) const noexcept;
+        bool contains(const char *substr) const noexcept;
     public:
         iterator begin() noexcept;
         iterator end() noexcept;

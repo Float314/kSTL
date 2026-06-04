@@ -278,15 +278,15 @@ namespace kstd {
     }
 
     bool string::ends_with(const char *suffix) const noexcept {
-        size_t len = strlen(suffix);
-        if (this->_data == nullptr || this->_size < len) {
+        size_t suffix_len = strlen(suffix); 
+        if (this->_data == nullptr || this->_size < suffix_len) {
             return false;
         }
 
-        for (size_t _i = len; _i != 0; --_i) {
-            size_t i = _i - 1;
 
-            if (suffix[i] != this->_data[i]) {
+        size_t j = 0;
+        for (size_t i = this->_size - suffix_len; i < this->_size && j < suffix_len; ++i && ++j) {
+            if (this->_data[i] != suffix[j]) {
                 return false;
             }
         }
@@ -295,20 +295,66 @@ namespace kstd {
     }
 
     bool string::ends_with(const string &suffix) const noexcept {
-        size_t len = suffix._size;
-        if (this->_data == nullptr || this->_size < len) {
+        size_t suffix_len = suffix._size; 
+        if (this->_data == nullptr || this->_size < suffix_len) {
             return false;
         }
 
-        for (size_t _i = len; _i != 0; --_i) {
-            size_t i = _i - 1;
 
-            if (suffix[i] != this->_data[i]) {
+        size_t j = 0;
+        for (size_t i = this->_size - suffix_len; i < this->_size && j < suffix_len; ++i && ++j) {
+            if (this->_data[i] != suffix[j]) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    bool string::contains(char target) const noexcept {
+        if (this->_data == nullptr || this->_size == 0) {
+            return false;
+        }
+
+        for (size_t i = 0; i < this->_size; ++i) {
+            if (this->_data[i] == target) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool string::contains(const char *target) const noexcept {
+        if (this->_data == nullptr || this->_size == 0 ) {
+            return false;
+        }
+
+        size_t target_len = strlen(target);
+
+        if (target_len == 0) {
+            // TODO: Verify this behaviour with the Standard
+            return true;
+        }
+
+        // abc << 3
+        // abcdefghi
+        //   ^    
+
+        for (size_t i = 0; i + target_len <= this->_size; ++i) {
+            size_t accumulated_equals = 0;
+            for (size_t j = 0; j < target_len; ++j) {
+                if (target[j] == this->_data[i + j]) {
+                    ++accumulated_equals;
+                }
+            }
+
+            if (accumulated_equals == target_len) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     const char* string::c_str() const noexcept {

@@ -93,6 +93,7 @@ if (KSTL_TESTS)
         string/cstring
         string/edge_case_indexing
         string/iterators
+        string/checkers
 
         vector/basic
         vector/iterators
