@@ -205,8 +205,9 @@ namespace kstd {
             return this->_size == 0;
         }
 
-        // TODO: Implement
-        size_t max_size() const noexcept = delete;
+        size_t max_size() const noexcept {
+            return this->bucket_count;
+        }
 
         iterator find(const Key &key) noexcept {
             if (this->nodes != nullptr) {
