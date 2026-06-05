@@ -111,6 +111,8 @@ if (KSTL_TESTS)
         optional/basic
         optional/nullopt
 
+        utility/basic
+
         # Integration
         integration/vector_of_strings
         integration/unordered_map_of_vector_of_ints_and_string

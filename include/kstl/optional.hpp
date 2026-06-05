@@ -1,5 +1,6 @@
 #pragma once
 
+#include <kstl/macros.hpp>
 #include <kstl/runtime.hpp>
 #include <kstl/stdlib.hpp>
 #include <kstl/utility.hpp>
