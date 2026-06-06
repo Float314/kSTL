@@ -1,14 +1,19 @@
 #pragma once
 
 #include "kstl/types.hpp"
+#include "kstl/memory.hpp"
 
 namespace kstd {
+    /// @brief A heap-allocated string
+    /// @note data is not mutable if capacity() == 0
     class string {
     public:
         using iterator = char *;
         using const_iterator = const char *;
 
         static constexpr size_t npos = size_t(-1);
+    public:
+        static allocator<char> allocator;
     private:
         char *_data = nullptr;
         size_t _size = 0;
@@ -83,6 +88,7 @@ namespace kstd {
     public:
         string();
         string(const char *data);
+        string(const char *data, size_t length);
         string(size_t n, char c);
 
         string(const string &s);

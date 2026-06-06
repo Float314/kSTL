@@ -120,6 +120,10 @@ if (KSTL_TESTS)
         integration/unordered_map_of_vector_of_ints_and_string
     )
 
+    set(FUZZER_NAMES
+        fuzz/string
+    )
+
     add_library(log_vector STATIC
         tests/vector/log_vector.cpp
     )
@@ -153,6 +157,45 @@ if (KSTL_TESTS)
         target_link_libraries(${test_target} PRIVATE
             kstl
             log_vector
+        )
+
+        set_target_properties(${test_target} PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY
+            "${CMAKE_SOURCE_DIR}/bin/tests/${test_category}"
+
+            OUTPUT_NAME
+            "${test_binary}"
+        )
+    endforeach()
+
+    foreach(test_name IN LISTS FUZZER_NAMES)
+        string(REPLACE "/" "_" test_target "${test_name}")
+
+        get_filename_component(test_category "${test_name}" DIRECTORY)
+        get_filename_component(test_binary "${test_name}" NAME)
+
+        add_executable(${test_target}
+            tests/common.cpp
+            tests/${test_name}.cpp
+        )
+
+        target_include_directories(${test_target} PRIVATE
+            include
+            src/include
+            tests
+        )
+
+        target_link_libraries(${test_target} PRIVATE
+            kstl
+            log_vector
+        )
+
+        target_compile_options(${test_target} PRIVATE
+            -fsanitize=fuzzer,address,undefined
+        )
+
+        target_link_options(${test_target} PRIVATE
+            -fsanitize=fuzzer,address,undefined
         )
 
         set_target_properties(${test_target} PROPERTIES

@@ -9,6 +9,8 @@ namespace kstl_globals {
 }
 
 namespace kstd {
+    allocator<char> string::allocator = {}; // Default allocator
+
     char null_terminator = '\0';
 
     bool streq_2n(const char *s1, const char *s2, size_t s1_len, size_t s2_len);
@@ -18,13 +20,21 @@ namespace kstd {
     string::string(const char *data) {
         this->_size = strlen(data);
         this->_capacity = this->_size + 1;
-        this->_data = (char*) kstl_globals::malloc(this->_capacity);
+        this->_data = (char*) allocator.allocate(this->_capacity);
         strncpy(this->_data, data, this->_capacity);
         this->_data[this->_capacity - 1] = '\0';
     }
 
     string::string(size_t n, char c) {
         this->append(n, c);
+    }
+
+    string::string(const char *data, size_t length) {
+        this->_capacity = length + 1;
+        this->_size = length;
+        this->_data = reinterpret_cast<char*>(allocator.allocate(this->_capacity));
+        memcpy(this->_data, data, length);
+        this->_data[length] = '\0';
     }
 
     size_t string::size() const noexcept {
@@ -39,7 +49,7 @@ namespace kstd {
         if (this->_data == nullptr) {
             this->_capacity = 1;
             this->_size = 0;
-            this->_data = reinterpret_cast<char*>(kstl_globals::malloc(this->_capacity));
+            this->_data = reinterpret_cast<char*>(allocator.allocate(this->_capacity));
         }
     } 
 
@@ -57,9 +67,9 @@ namespace kstd {
         if (this->_size + 2 > this->_capacity) {
             size_t old_capacity = this->_capacity;
             this->_capacity *= 2;
-            char *new_data = (char*) kstl_globals::malloc(this->_capacity);
+            char *new_data = (char*) allocator.allocate(this->_capacity);
             kstd::memcpy(new_data, this->_data, old_capacity);
-            kstl_globals::free(this->_data);
+            allocator.deallocate(this->_data, old_capacity);
             this->_data = new_data;
         }
 
@@ -76,9 +86,9 @@ namespace kstd {
             if (this->_size + 2 > this->_capacity) {
                 size_t old_capacity = this->_capacity;
                 this->_capacity *= 2;
-                char *new_data = (char*) kstl_globals::malloc(this->_capacity);
+                char *new_data = (char*) allocator.allocate(this->_capacity);
                 kstd::memcpy(new_data, this->_data, old_capacity);
-                kstl_globals::free(this->_data);
+                allocator.deallocate(this->_data, old_capacity);
                 this->_data = new_data;
             }
 
@@ -120,11 +130,11 @@ namespace kstd {
         size_t old_capacity = this->_capacity;
         this->_capacity = elements;
 
-        char *new_data = reinterpret_cast<char*>(kstl_globals::malloc(this->_capacity));
+        char *new_data = reinterpret_cast<char*>(allocator.allocate(this->_capacity));
 
         kstd::memcpy(new_data, this->_data, old_capacity);
         kstd::memset(new_data + this->_size, 0, elements - old_capacity);
-        kstl_globals::free(this->_data);
+        allocator.deallocate(this->_data, old_capacity);
 
         this->_data = new_data;
     }
@@ -141,14 +151,15 @@ namespace kstd {
         }
 
         size_t old_size = this->_size;
+        size_t old_capacity = this->_capacity;
         this->_capacity = elements + 1;
         this->_size = elements;
 
-        char *new_data = reinterpret_cast<char*>(kstl_globals::malloc(this->_capacity));
+        char *new_data = reinterpret_cast<char*>(allocator.allocate(this->_capacity));
 
         kstd::memcpy(new_data, this->_data, old_size);
         kstd::memset(new_data + this->_size, 0, elements - old_size);
-        kstl_globals::free(this->_data);
+        allocator.deallocate(this->_data, old_capacity);
 
         this->_data = new_data;
     }
@@ -157,10 +168,11 @@ namespace kstd {
         this->null_check();
 
         if (this->_capacity > this->_size + 1) {
+            size_t old_capacity = this->_capacity;
             this->_capacity = this->_size + 1;
-            char *new_data = (char*) kstl_globals::malloc(this->_capacity);
+            char *new_data = (char*) allocator.allocate(this->_capacity);
             kstd::memcpy(new_data, this->_data, this->_capacity);
-            kstl_globals::free(this->_data);
+            allocator.deallocate(this->_data, old_capacity);
             this->_data = new_data;
         }
     }
@@ -390,12 +402,12 @@ namespace kstd {
 
     string& string::operator=(const char* s) noexcept {
         if (this->_data != nullptr) {
-            kstl_globals::free(this->_data);
+            allocator.deallocate(this->_data, this->_capacity);
         }
 
         this->_size = strlen(s);
         this->_capacity = this->_size + 1;
-        this->_data = (char*) kstl_globals::malloc(this->_capacity);
+        this->_data = (char*) allocator.allocate(this->_capacity);
         strncpy(this->_data, s, this->_capacity - 1);
         this->_data[this->_capacity - 1] = '\0';
         return *this;
@@ -405,12 +417,12 @@ namespace kstd {
         if (this == &s) return *this;
 
         if (this->_data != nullptr) {
-            kstl_globals::free(this->_data);
+            allocator.deallocate(this->_data, this->_capacity);
         }
 
         this->_size = s._size;
         this->_capacity = s._capacity;
-        this->_data = (char*) kstl_globals::malloc(this->_capacity);
+        this->_data = (char*) allocator.allocate(this->_capacity);
         kstd::memcpy(this->_data, s._data, s._capacity);
         return *this;
     }
@@ -420,7 +432,7 @@ namespace kstd {
             return *this;
         }
 
-        kstl_globals::free(this->_data);
+        allocator.deallocate(this->_data, this->_capacity);
 
         this->_data = other._data;
         this->_size = other._size;
@@ -467,7 +479,7 @@ namespace kstd {
     string::string(const string &s) {
         this->_size = s._size;
         this->_capacity = s._capacity;
-        this->_data = (char*) kstl_globals::malloc(this->_capacity);
+        this->_data = (char*) allocator.allocate(this->_capacity);
         kstd::memcpy(this->_data, s._data, s._capacity);
     }
 
@@ -483,7 +495,7 @@ namespace kstd {
 
     string::~string() {
         if (this->_data != nullptr) {
-            kstl_globals::free(this->_data);
+            allocator.deallocate(this->_data, this->_capacity);
         }
     }
 

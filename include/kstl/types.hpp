@@ -61,6 +61,29 @@ typedef uint32_t uintptr_t;
 #define SIZE_MAX __SIZE_MAX__
 #endif
 
+#ifndef CHAR_BIT
+#define CHAR_BIT __CHAR_BIT__
+#endif
+
+#ifdef __cplusplus
+#define kStaticAssert(condition) static_assert(condition)
+#else
+#ifdef __STDC_VERSION__
+#if __STDC_VERSION__ >= 202311L
+#define kStaticAssert(condition) static_assert(condition)
+#elif __STDC_VERSION__ >= 201112L
+#define kStaticAssert(condition) _Static_assert(condition)   
+#else 
+#define kStaticAssert(condition)
+#endif
+#else
+#define kStaticAssert(condition)
+#endif
+#endif
+
+kStaticAssert(sizeof(size_t) == sizeof(uint64_t) || sizeof(size_t) == sizeof(uint32_t));
+kStaticAssert(CHAR_BIT == 8);
+
 #ifdef __cplusplus
 namespace kstd {
     using uint8_t   = ::uint8_t;
