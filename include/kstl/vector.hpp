@@ -3,6 +3,7 @@
 #include <concepts>
 #include <initializer_list>
 #include <type_traits>
+#include "kstl/memory.hpp"
 #include "kstl/types.hpp"
 #include "kstl/string.hpp"
 #include "kstl/utility.hpp"
@@ -11,8 +12,6 @@
 
 namespace kstl_globals {
     extern kstd::rt_init g_init_data;
-    extern void* (*malloc)(size_t);
-    extern void (*free)(void*);
 }
 
 namespace kstd::detail {
@@ -77,12 +76,13 @@ namespace kstd::detail {
 }
 
 namespace kstd {
-    template<typename T>
+    template<typename T, typename Allocator = kstd::allocator<T>>
     class vector {
     public:
         using iterator = T *;
         using const_iterator = const T *;
     private:
+        [[no_unique_address]] Allocator allocator;
         T *_data = nullptr;
         size_t _size = 0;
         size_t _capacity = 0;
@@ -90,13 +90,11 @@ namespace kstd {
         void grow() noexcept {
             this->_capacity *= 2;
 
-            T* new_data = reinterpret_cast<T*>(
-                kstl_globals::malloc(sizeof(T) * this->_capacity)
-            );
+            T* new_data = allocator.allocate(this->_capacity);
 
             detail::move_array(new_data, this->_data, this->_size);
 
-            kstl_globals::free(this->_data);
+            allocator.deallocate(this->_data, this->_capacity);
             this->_data = new_data;
         }
     public:
@@ -128,7 +126,7 @@ namespace kstd {
             if (this->_data == nullptr) {
                 this->_capacity = 1;
                 this->_size = 0;
-                this->_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
+                this->_data = allocator.allocate(this->_capacity); 
             }
 
             if (this->_size + 1 > this->_capacity) {
@@ -142,7 +140,7 @@ namespace kstd {
             if (this->_data == nullptr) {
                 this->_capacity = 1;
                 this->_size = 0;
-                this->_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
+                this->_data = allocator.allocate(this->_capacity);
             }
 
             if (this->_size + 1 > this->_capacity) {
@@ -170,7 +168,7 @@ namespace kstd {
             detail::move_array(this->_data + this->_size, other._data, other._size);
             this->_size += other._size;
 
-            kstl_globals::free(other._data);
+            allocator.deallocate(other._data, other._capacity);
 
             other._data = nullptr;
             other._size = 0;
@@ -182,7 +180,7 @@ namespace kstd {
             if (this->_data == nullptr) {
                 this->_capacity = 1;
                 this->_size = 0;
-                this->_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
+                this->_data = allocator.allocate(this->_capacity);
             }
 
             if (this->_size + 1 > this->_capacity) {
@@ -205,7 +203,7 @@ namespace kstd {
             if (this->_data == nullptr) {
                 this->_capacity = 1;
                 this->_size = 0;
-                this->_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
+                this->_data = allocator.allocate(this->_capacity);
             }
 
             if (elements < this->_capacity) {
@@ -216,9 +214,9 @@ namespace kstd {
 
             size_t old_capacity = this->_capacity;
             this->_capacity = kstd::max(elements, _capacity * 2);
-            T *new_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
+            T *new_data = allocator.allocate(this->_capacity); 
             detail::move_array(new_data, this->_data, old_capacity);
-            kstl_globals::free(this->_data);
+            allocator.deallocate(this->_data, this->_capacity);
             this->_data = new_data;
         }
 
@@ -226,10 +224,10 @@ namespace kstd {
             if (this->_data == nullptr) {
                 this->_capacity = 1;
                 this->_size = 0;
-                this->_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
+                this->_data = allocator.allocate(this->_capacity);
             }
 
-            T* new_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * elements));
+            T* new_data = allocator.allocate(elements);
 
             size_t copy_count = (elements < _size) ? elements : _size;
 
@@ -239,7 +237,7 @@ namespace kstd {
                 new (&new_data[i]) T();
             }
 
-            kstl_globals::free(_data);
+            allocator.deallocate(this->_data, this->_capacity);
 
             _data = new_data;
             _size = elements;
@@ -250,9 +248,9 @@ namespace kstd {
             if (this->_capacity > this->_size) {
                 size_t old_capacity = this->_capacity;
                 this->_capacity = this->_size;
-                T *new_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
+                T *new_data = allocator.allocate(this->_capacity);
                 detail::move_array(new_data, this->_data, old_capacity);
-                kstl_globals::free(this->_data);
+                allocator.deallocate(this->_data, this->_capacity);
                 this->_data = new_data;
             }
         }
@@ -274,14 +272,12 @@ namespace kstd {
                 this->_data[i].~T();
             }
 
-            kstl_globals::free(this->_data);
+            allocator.deallocate(this->_data, this->_capacity);
 
             this->_size = other._size;
             this->_capacity = other._capacity;
 
-            this->_data = reinterpret_cast<T*>(
-                kstl_globals::malloc(sizeof(T) * this->_capacity)
-            );
+            this->_data = allocator.allocate(this->_capacity);
 
             detail::copy_array(this->_data, other._data, this->_size);
 
@@ -295,7 +291,7 @@ namespace kstd {
                 this->_data[i].~T();
             }
 
-            kstl_globals::free(this->_data);
+            allocator.deallocate(this->_data, this->_capacity);
 
             this->_size = v._size;
             this->_capacity = v._capacity;
@@ -357,7 +353,7 @@ namespace kstd {
         vector(const vector &v) requires std::copy_constructible<T> {
             this->_size = v._size;
             this->_capacity = v._capacity;
-            this->_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
+            this->_data = allocator.allocate(this->_capacity);
             for (size_t i = 0; i < this->_size; i++) {
                 new (this->_data + i) T(v._data[i]);
             }
@@ -366,7 +362,7 @@ namespace kstd {
         vector(size_t sz) {
             this->_size = sz;
             this->_capacity = sz;
-            this->_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
+            this->_data = allocator.allocate(this->_capacity);
             for (size_t i = 0; i < this->_size; ++i) {
                 new (this->_data + i) T();
             }
@@ -375,7 +371,7 @@ namespace kstd {
         vector(std::initializer_list<T> list) {
             this->_size = 0;
             this->_capacity = list.size();
-            this->_data = reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * this->_capacity));
+            this->_data = allocator.allocate(this->_capacity);
 
             for (const T &item : list) {
                 this->push_back(item);
@@ -398,7 +394,7 @@ namespace kstd {
                     this->_data[i].~T();
                 }
 
-                kstl_globals::free(this->_data);
+                allocator.deallocate(this->_data, this->_capacity);
             }
         }
     };

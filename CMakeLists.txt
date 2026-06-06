@@ -102,6 +102,8 @@ if (KSTL_TESTS)
         vector/move_only_type
         vector/reserveless_stress_allocations
         vector/construct_and_destruct
+        vector/custom_allocator
+        vector/null_allocator
 
         unordered_map/basic
         unordered_map/iterators

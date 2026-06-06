@@ -57,6 +57,10 @@ typedef uint32_t uintptr_t;
 #define UINT64_MAX 18446744073709551615ULL
 #endif
 
+#ifndef SIZE_MAX
+#define SIZE_MAX __SIZE_MAX__
+#endif
+
 #ifdef __cplusplus
 namespace kstd {
     using uint8_t   = ::uint8_t;

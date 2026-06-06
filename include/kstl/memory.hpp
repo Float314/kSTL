@@ -1,7 +1,7 @@
 #pragma once
 
-#include "kstl/cstddef.hpp"
-#include <cstddef>
+#include <kstl/cstddef.hpp>
+#include <kstl/macros.hpp>
 #include <kstl/runtime.hpp>
 #include <kstl/stdlib.hpp>
 #include <kstl/utility.hpp>
@@ -27,6 +27,75 @@ namespace kstd::detail {
             delete ptr;
         }
     };
+}
+
+namespace kstd {
+    template<typename T>
+    constexpr T* addressof(T &arg) {
+        return &arg; // TODO: Actually implement it
+    }
+
+    template<typename T>
+    constexpr const T* addressof(const T &&arg) = delete;
+
+    template<typename T, typename... Args>
+    constexpr T* construct_at(T *location, Args&&... args) {
+        return new (location) T(kstd::forward<Args>(args)...);
+    }
+
+    template<typename T>
+    constexpr void destroy_at(T *location) {
+        location->~T();
+    }
+}
+
+namespace kstd {
+    template<typename T>
+    class allocator {
+    public:
+        constexpr T* address(T &x) const noexcept {
+            return addressof(x);
+        }
+        
+        constexpr const T* address(const T &x) const noexcept {
+            return addressof(x);
+        }
+
+        constexpr T* allocate(size_t n) noexcept {
+            return reinterpret_cast<T*>(kstl_globals::malloc(sizeof(T) * n));
+        }
+
+        constexpr void deallocate(T *p, size_t /* n -> original n passed in by allocate */) noexcept {
+            kstl_globals::free(p);
+        }
+
+        constexpr size_t max_size() const noexcept {
+            return SIZE_MAX; // TODO: Get max size of allocation
+        }
+
+        void construct(T *p, const T &value) noexcept {
+            new (p) T(value);
+        }
+
+        void destroy(T *p) noexcept {
+            p->~T();
+        }
+    public:
+        constexpr allocator() noexcept = default;
+        constexpr allocator(const allocator &) noexcept = default;
+    public:
+        ~allocator() = default;
+    };
+
+    template<typename T>
+    constexpr bool operator==(const allocator<T> &lhs, const allocator<T> &rhs) {
+        return true;
+    }
+
+    template<typename T>
+    constexpr bool operator!=(const allocator<T> &lhs, const allocator<T> &rhs) {
+        return !operator==(lhs, rhs);
+    }
 }
 
 namespace kstd {
