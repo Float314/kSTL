@@ -18,6 +18,12 @@ option(KSTL_FLOATING_POINT_SUPPORTED "Support floating-point operations" ON)
 
 set(KSTL_COMPILER_FLAGS -Wall -Wextra -Wpedantic -Werror=return-type -Werror=uninitialized -Werror=nonnull -Werror=null-dereference -Werror=strict-aliasing -Werror=undef -Werror=sign-compare -fno-omit-frame-pointer)
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(CLANG ON)
+else()
+    set(CLANG OFF)
+endif()
+
 if (KSTL_FREESTANDING)
     if (KSTL_FREESTANDING_X86)
         message(STATUS "Builting as 32-bit x86")
@@ -120,9 +126,11 @@ if (KSTL_TESTS)
         integration/unordered_map_of_vector_of_ints_and_string
     )
 
-    set(FUZZER_NAMES
-        fuzz/string
-    )
+    if (CLANG)
+        set(FUZZER_NAMES
+            fuzz/string
+        )
+    endif()
 
     add_library(log_vector STATIC
         tests/vector/log_vector.cpp
@@ -190,15 +198,13 @@ if (KSTL_TESTS)
             log_vector
         )
 
-        if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-            target_compile_options(${test_target} PRIVATE
-                -fsanitize=fuzzer,address,undefined
-            )
+        target_compile_options(${test_target} PRIVATE
+            -fsanitize=fuzzer,address,undefined
+        )
 
-            target_link_options(${test_target} PRIVATE
-                -fsanitize=fuzzer,address,undefined
-            )
-        endif()
+        target_link_options(${test_target} PRIVATE
+            -fsanitize=fuzzer,address,undefined
+        )
 
         set_target_properties(${test_target} PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY
