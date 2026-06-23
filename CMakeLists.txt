@@ -190,13 +190,15 @@ if (KSTL_TESTS)
             log_vector
         )
 
-        target_compile_options(${test_target} PRIVATE
-            -fsanitize=fuzzer,address,undefined
-        )
+        if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+            target_compile_options(${test_target} PRIVATE
+                -fsanitize=fuzzer,address,undefined
+            )
 
-        target_link_options(${test_target} PRIVATE
-            -fsanitize=fuzzer,address,undefined
-        )
+            target_link_options(${test_target} PRIVATE
+                -fsanitize=fuzzer,address,undefined
+            )
+        endif()
 
         set_target_properties(${test_target} PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY
