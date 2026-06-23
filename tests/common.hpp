@@ -89,4 +89,5 @@ namespace kstl::test {
         ~allocator() = default;
     };
 
+    constexpr int intentional_failure = 234;
 }

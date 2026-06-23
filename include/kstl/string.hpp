@@ -13,7 +13,7 @@ namespace kstd {
 
         static constexpr size_t npos = size_t(-1);
     public:
-        static allocator<char> allocator;
+        static allocator<char> alloc;
     private:
         char *_data = nullptr;
         size_t _size = 0;

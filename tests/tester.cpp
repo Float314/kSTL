@@ -89,15 +89,20 @@ int main(int argc, char **argv) {
         int status;
         waitpid(child, &status, 0);
         bool success = WIFEXITED(status) && WEXITSTATUS(status) == 0;
+        bool intentional_failure = WEXITSTATUS(status) == 234;
 
-        if (!success) {
-            std::lock_guard<std::mutex> _(output_mutex); 
-            output << "\e[2K\e[38;5;196m" << "[FAIL]" << "\e[0m" << " " << relstr << std::endl;
-            ++failed;
-        } else {
+        if (success) {
             std::lock_guard<std::mutex> _(output_mutex); 
             output << "\e[2K\e[38;5;154m" << "[PASS]" << "\e[0m" << " " << relstr << std::endl;
             ++passed;
+        } else if (intentional_failure) {
+            std::lock_guard<std::mutex> _(output_mutex); 
+            output << "\e[2K\e[38;5;220m" << "[XFAIL]" << "\e[0m" << " " << relstr << std::endl;
+            ++passed;
+        } else {
+            std::lock_guard<std::mutex> _(output_mutex); 
+            output << "\e[2K\e[38;5;196m" << "[FAIL]" << "\e[0m" << " " << relstr << std::endl;
+            ++failed;
         }
 
         posix_spawn_file_actions_destroy(&actions);
